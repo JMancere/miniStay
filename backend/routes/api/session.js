@@ -6,6 +6,15 @@ const bcrypt = require('bcryptjs');
 const { setTokenCookie, restoreUser } = require('../../utils/auth');
 const { User } = require('../../db/models');
 
+// Log out
+router.delete(
+    '/',
+    (_req, res) => {
+      res.clearCookie('token');
+      return res.json({ message: 'success' });
+    }
+  );
+  
 // Log in
 router.post(
     '/',
@@ -43,5 +52,5 @@ router.post(
     }
   );
 
-  
+
 module.exports = router;
