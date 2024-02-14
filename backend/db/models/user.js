@@ -28,6 +28,15 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
+      firstName: {
+        type: DataTypes.STRING,
+        validate: {}
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        validate: {
+          }
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
