@@ -27,6 +27,18 @@ const validateSignup = [
       .exists({ checkFalsy: true })
       .isLength({ min: 6 })
       .withMessage('Password must be 6 characters or more.'),
+      check('lastName')
+      .isAlpha()
+      .withMessage('Last Name must be alpha only.'),
+    check('lastName')
+      .notEmpty({ min: 6 })
+      .withMessage('Last name must not be empty'),
+    check('firstName')
+      .isAlpha()
+      .withMessage('First Name must be alpha only.'),
+    check('firstName')
+      .notEmpty({ min: 6 })
+      .withMessage('First name must not be empty'),
     handleValidationErrors
   ];
 
