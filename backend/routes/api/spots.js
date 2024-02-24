@@ -16,9 +16,9 @@ router.get('/',
     let spots = await Spot.findAll();
 
 
-    // return res.json({
-    //     spots
-    // });
+    return res.json({
+        spots
+    });
   }
 );
 
