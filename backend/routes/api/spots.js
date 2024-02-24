@@ -34,6 +34,21 @@ router.post('/:spotId/bookings', requireAuth, stub,
      (req, res) => {}
 );
 
+//Get all Spots
+router.get('/', stub,
+    (req, res) => {}
+);
+
+//Get details of a Spot from an id
+router.get('/:spotId', stub,
+    (req, res) => {}
+);
+
+//Get all Reviews by a Spot's id
+router.get('/:spotId/reviews', stub,
+    (req, res) => {}
+);
+
 //REQ AUTH - Get Spots of Current User
 router.get('/current', requireAuth, stub,
     (req, res) => {}
