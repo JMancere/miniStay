@@ -12,15 +12,17 @@ const { SpotImage } = require('../../db/models');
 const { stub } = require('../../utils/utils');
 
 
-const calcPreviewAndAvgReview = (spots) => {
+const calcPreviewAndAvgReview = (spots, option) => {
     spots.forEach(spot => {
-        const filter = spot.SpotImages.filter(si => {
-            return si.preview;
-        });
-        if (filter.length > 0)
-          spot.dataValues.previewImage = filter[0].url
-        else
-          spot.dataValues.previewImage = '';
+        if (option.previewImage){
+            const filter = spot.SpotImages.filter(si => {
+                return si.preview;
+            });
+            if (filter.length > 0)
+            spot.dataValues.previewImage = filter[0].url
+            else
+            spot.dataValues.previewImage = '';
+        }
 
         let count = 0;
         let sum = 0;
@@ -29,10 +31,18 @@ const calcPreviewAndAvgReview = (spots) => {
             sum += review.stars;
         }
 
-        if (count > 0)
-            spot.dataValues.avgRating = sum/count
-        else
-            spot.dataValues.avgRating = 'none';
+        if (option.avgRating){
+            if (count > 0)
+                spot.dataValues.avgRating = sum/count
+            else
+                spot.dataValues.avgRating = 'none';
+        }
+        if (option.avgStarRating){
+            if (count > 0)
+                spot.dataValues.avgStarRating = sum/count
+            else
+                spot.dataValues.avgStarRating = 'none';
+        }
     })
 
 };
@@ -49,7 +59,8 @@ router.get('/',
         }
     );
     if (spots){
-        calcPreviewAndAvgReview(spots);
+        const options = {previewImage: true, avgRating: true};
+        calcPreviewAndAvgReview(spots, options);
 
         //Remove spotimages and reviews from resultset.
         spots.forEach(spot => {
@@ -69,15 +80,13 @@ router.get('/current', requireAuth,
         let spots = await Spot.findAll(
             {
                 where: {OwnerId: req.user.id},
-                include: ['Reviews', 'SpotImages']
-                //If you include the where clause it will only return spots that have preview.
-                //So, if a spot does not have preview, it wont list. Which is not what we want.
-                //include: ['Reviews', { model: SpotImage, where: {preview: true}}],
+                include: ['Reviews', 'SpotImages', 'Users']
             }
         );
 
         if (spots){
-            calcPreviewAndAvgReview(spots);
+            const options = {previewImage: true, avgRating: true};
+            calcPreviewAndAvgReview(spots, options);
 
             //Remove spotimages and reviews from resultset.
             spots.forEach(spot => {
@@ -92,8 +101,41 @@ router.get('/current', requireAuth,
 );
 
 //Get details of a Spot from an id
-router.get('/:spotId', stub,
-  (req, res) => {
+router.get('/:spotId',
+  async (req, res) => {
+    const {spotId} = req.body
+    let spots = await Spot.findAll(
+        {
+            where: {id: spotId},
+            include: ['Reviews', 'SpotImages']
+        }
+    );
+
+    if (!spots || spots.length === 0){
+        const err = new Error(`Spot does not exist with id ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+    spots[0].dataValues.numReviews = spots[0].Reviews.length;
+
+    calcPreviewAndAvgReview(spots, {avgStarRating: true});
+
+    spots.forEach(spot => {
+        spot.dataValues.SpotImages.forEach(s => {
+            delete s.dataValues.spotId
+        })
+        delete spot.dataValues.Reviews
+    });
+    spots[0].dataValues.Owner = {
+        id:req.user.id,
+        firstName:req.user.firstName,
+        lastName:req.user.lastName
+    };
+
+    return res.json({
+        spots
+    });
   }
 );
 
