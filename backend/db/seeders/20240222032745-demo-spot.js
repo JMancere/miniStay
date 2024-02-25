@@ -18,6 +18,7 @@ module.exports = {
         lat: 1,
         lng: 1,
         name: 'Spot1',
+        description: 'spot1Descrip',
         price: '100.01'
       },
       {
@@ -29,6 +30,7 @@ module.exports = {
         lat: 2,
         lng: 2,
         name: 'Spot2',
+        description: 'spot2Descrip',
         price: '200.02'
       },
       {
@@ -40,7 +42,20 @@ module.exports = {
         lat: 3,
         lng: 3,
         name: 'Spot3',
+        description: 'spot3Descrip',
         price: '300.03'
+      },
+      {
+        ownerId: 4,
+        address: 'add4',
+        city: 'city4',
+        state: 'state4',
+        country: 'country4',
+        lat: 4,
+        lng: 4,
+        name: 'Spot4',
+        description: 'spot4Descrip',
+        price: '400.04'
       },
     ], { validate: true });
   },

@@ -10,8 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Spot.hasMany(models.Review);
-      Spot.hasMany(models.Booking);
+      Spot.hasMany(models.Review, { foreignKey: 'spotId'});
+      Spot.hasMany(models.Booking, { foreignKey: 'spotId'});
+      Spot.hasMany(models.SpotImage, { foreignKey: 'spotId'});
       Spot.belongsTo(
         models.User,
         { foreignKey: 'ownerId'
@@ -53,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: {}
     },
+    description: {
+      type: DataTypes.STRING,
+      validate: {}
+    },
     price: {
       type: DataTypes.FLOAT,
       validate: {}
@@ -62,7 +67,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Spot',
     defaultScope: {
       attributes: {
-        exclude: ["createdAt", "updatedAt"]
+        //exclude: ["createdAt", "updatedAt"]
       }
     },
   });

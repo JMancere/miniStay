@@ -15,13 +15,28 @@ module.exports = {
         spotId: 1
       },
       {
+        url: 'http://demo.io/Fake1P',
+        preview: false,
+        spotId: 1
+      },
+      {
         url: 'http://demo.io/Fake2',
         preview: false,
         spotId: 2
       },
       {
+        url: 'http://demo.io/Fake2P',
+        preview: true,
+        spotId: 2
+      },
+      {
         url: 'http://demo.io/Fake3',
         preview: false,
+        spotId: 3
+      },
+      {
+        url: 'http://demo.io/Fake3P',
+        preview: true,
         spotId: 3
       },
     ], { validate: true });
