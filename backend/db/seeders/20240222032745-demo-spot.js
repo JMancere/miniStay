@@ -57,6 +57,18 @@ module.exports = {
         description: 'spot4Descrip',
         price: '400.04'
       },
+      {
+        ownerId: 1,
+        address: 'add1',
+        city: 'city1',
+        state: 'state1',
+        country: 'country1',
+        lat: 1,
+        lng: 1,
+        name: 'Spot1.1',
+        description: 'spot1.1Descrip',
+        price: '100.01'
+      },
     ], { validate: true });
   },
 

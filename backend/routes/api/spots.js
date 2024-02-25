@@ -48,18 +48,47 @@ router.get('/',
             //include: ['Reviews', { model: SpotImage, where: {preview: true}}],
         }
     );
+    if (spots){
+        calcPreviewAndAvgReview(spots);
 
-    calcPreviewAndAvgReview(spots);
-
-    //Remove spotimages and reviews from resultset.
-    spots.forEach(spot => {
-        delete spot.dataValues.SpotImages
-        delete spot.dataValues.Reviews
-    });
+        //Remove spotimages and reviews from resultset.
+        spots.forEach(spot => {
+            delete spot.dataValues.SpotImages
+            delete spot.dataValues.Reviews
+        });
+    }
     return res.json({
         spots
     });
   }
+)
+
+//REQ AUTH - Get Spots of Current User
+router.get('/current', requireAuth,
+    async (req, res) => {
+        let spots = await Spot.findAll(
+            {
+                where: {OwnerId: req.user.id},
+                include: ['Reviews', 'SpotImages']
+                //If you include the where clause it will only return spots that have preview.
+                //So, if a spot does not have preview, it wont list. Which is not what we want.
+                //include: ['Reviews', { model: SpotImage, where: {preview: true}}],
+            }
+        );
+
+        if (spots){
+            calcPreviewAndAvgReview(spots);
+
+            //Remove spotimages and reviews from resultset.
+            spots.forEach(spot => {
+                delete spot.dataValues.SpotImages
+                delete spot.dataValues.Reviews
+            });
+        }
+        return res.json({
+            spots
+        });
+    }
 );
 
 //Get details of a Spot from an id
@@ -73,10 +102,6 @@ router.get('/:spotId/reviews', stub,
     (req, res) => {}
 );
 
-//REQ AUTH - Get Spots of Current User
-router.get('/current', requireAuth, stub,
-    (req, res) => {}
-);
 
 //REQ AUTH - Get All Bookings for a Spot
 router.get('/:spotId/bookings', requireAuth, stub,
