@@ -80,7 +80,7 @@ router.get('/current', requireAuth,
     async (req, res) => {
         let spots = await Spot.findAll(
             {
-                where: {OwnerId: req.user.id},
+                where: {ownerId: req.user.id},
                 //include: ['Reviews', 'SpotImages', 'User']
                 include: ['Reviews', 'SpotImages']
             }
