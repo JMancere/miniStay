@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Review.hasMany(models.ReviewImage);
+      Review.hasMany(models.ReviewImage, { foreignKey: 'reviewId'});
       Review.belongsTo(
         models.User,
         { foreignKey: 'userId' }
@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Review',
     defaultScope: {
       attributes: {
-        exclude: ["createdAt", "updatedAt"]
+        //exclude: ["createdAt", "updatedAt"]
       }
     },
   });

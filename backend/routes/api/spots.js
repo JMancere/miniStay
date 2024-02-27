@@ -3,9 +3,9 @@ const router = express.Router();
 // const { Op } = require('sequelize');
 
 const { requireAuth } = require('../../utils/auth');
-// const { User } = require('../../db/models');
+const { User } = require('../../db/models');
 const { Spot } = require('../../db/models');
-const { SpotImage } = require('../../db/models');
+const { Review } = require('../../db/models');
 
 // const { check } = require('express-validator');
 // const { handleValidationErrors } = require('../../utils/validation');
@@ -140,13 +140,40 @@ router.get('/:spotId',
 );
 
 //Get all Reviews by a Spot's id
-router.get('/:spotId/reviews', stub,
-    (req, res) => {}
+router.get('/:spotId/reviews',
+  async (req, res) => {
+    const {spotId} = req.body
+    let reviews = await Review.findAll(
+        {
+            where: {spotId: spotId},
+            include: ['ReviewImages', 'User']
+        }
+    );
+
+    if (!reviews || reviews.length === 0){
+        const err = new Error(`Reviews do not exist for spot ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    //const NeededUsers = {};
+    reviews.forEach(review => {
+        review.dataValues.ReviewImages.forEach(s => {
+            delete s.dataValues.reviewId
+        })
+        delete review.dataValues.User.dataValues.username;
+    });
+
+    return res.json({
+        reviews
+    });
+  }
 );
 
 
 //REQ AUTH - Get All Bookings for a Spot
-router.get('/:spotId/bookings', requireAuth, stub,
+router.get('/:spotId/bookings', requireAuth,
     (req, res) => {}
 );
 
