@@ -46,7 +46,7 @@ module.exports = {
         price: '300.03'
       },
       {
-        ownerId: 1, //4,
+        ownerId: 4,
         address: 'add4',
         city: 'city4',
         state: 'state4',
