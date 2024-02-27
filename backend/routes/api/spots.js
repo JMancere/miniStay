@@ -6,6 +6,7 @@ const { requireAuth } = require('../../utils/auth');
 const { User } = require('../../db/models');
 const { Spot } = require('../../db/models');
 const { Review } = require('../../db/models');
+const { Booking } = require('../../db/models');
 
 // const { check } = require('express-validator');
 // const { handleValidationErrors } = require('../../utils/validation');
@@ -174,7 +175,18 @@ router.get('/:spotId/reviews',
 
 //REQ AUTH - Get All Bookings for a Spot
 router.get('/:spotId/bookings', requireAuth,
-    (req, res) => {}
+  async (req, res) => {
+    const {spotId} = req.body
+    let bookings = await Booking.findAll(
+        {
+            where: {spotId},
+            //include: ['ReviewImages', 'User']
+        }
+    );
+    return res.json({
+        bookings
+    });
+   }
 );
 
 //REQ AUTH - Edit a Spot
