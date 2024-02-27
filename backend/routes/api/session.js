@@ -31,7 +31,7 @@ router.get(
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          username: user.username,
+          //username: user.username,
         };
         return res.json({
           user: safeUser
@@ -78,7 +78,7 @@ router.post(
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        username: user.username,
+        //username: user.username,
       };
 
       await setTokenCookie(res, safeUser);
