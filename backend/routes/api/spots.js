@@ -81,7 +81,8 @@ router.get('/current', requireAuth,
         let spots = await Spot.findAll(
             {
                 where: {OwnerId: req.user.id},
-                include: ['Reviews', 'SpotImages', 'Users']
+                //include: ['Reviews', 'SpotImages', 'User']
+                include: ['Reviews', 'SpotImages']
             }
         );
 
