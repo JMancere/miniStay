@@ -43,9 +43,16 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Booking',
     defaultScope: {
       attributes: {
-        exclude: ["createdAt", "updatedAt"]
+        exclude: ["userId", "id", "createdAt", "updatedAt"]
       }
     },
+    scopes: {
+      isOwner: {
+        attributes: {
+          //exclude: ["createdAt", "updatedAt"]
+        }
+        },
+    }
 });
   return Booking;
 };

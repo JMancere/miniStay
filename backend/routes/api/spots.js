@@ -106,6 +106,14 @@ router.get('/current', requireAuth,
 router.get('/:spotId',
   async (req, res) => {
     const {spotId} = req.body
+    if (spotId === undefined){
+        const err = new Error(`Spot does not exist with id of ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+
     let spots = await Spot.findAll(
         {
             where: {id: spotId},
@@ -145,6 +153,27 @@ router.get('/:spotId',
 router.get('/:spotId/reviews',
   async (req, res) => {
     const {spotId} = req.body
+
+    if (spotId === undefined){
+        const err = new Error(`Spot does not exist with id of ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    let spots = await Spot.findAll(
+        {
+            where: {id: spotId},
+        }
+    );
+
+    if (!spots || spots.length === 0){
+        const err = new Error(`Spot does not exist with id ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
     let reviews = await Review.findAll(
         {
             where: {spotId: spotId},
@@ -178,12 +207,63 @@ router.get('/:spotId/reviews',
 router.get('/:spotId/bookings', requireAuth,
   async (req, res) => {
     const {spotId} = req.body
-    let bookings = await Booking.findAll(
+
+    if (spotId === undefined){
+        const err = new Error(`Spot does not exist with id of ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    let spots = await Spot.findAll(
         {
-            where: {spotId},
-            //include: ['ReviewImages', 'User']
+            where: {id: spotId},
         }
     );
+
+    if (!spots || spots.length === 0){
+        const err = new Error(`Spot does not exist with id ${spotId}.`);
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    //console.log('111111', spots[0].dataValues.ownerId)
+    const isOwner = req.user.id === spots[0].dataValues.ownerId;
+
+    let bookings;
+
+    if (isOwner)
+        bookings = await Booking.scope('isOwner').findAll(
+            {
+                where: {spotId},
+                //include: ['Spot', 'User']
+                include: ['User']
+            }
+        );
+    else {
+        bookings = await Booking.findAll(
+            {
+                where: {spotId},
+                //include: ['Spot', 'User']
+                include: ['User']
+            }
+        );
+    }
+    //console.log('sdsdsdsdsds', bookings)
+    bookings.forEach(booking => {
+        //Are we the owner of this spot?
+        //const isOwner = req.user.id === booking.dataValues.Spot.dataValues.ownerId;
+        //console.log('111111', booking.dataValues.Spot.dataValues.ownerId)
+
+        if (isOwner){
+            delete booking.dataValues.User.dataValues.username;
+        } else {
+            delete booking.dataValues.User;
+        }
+    });
+
+
     return res.json({
         bookings
     });
