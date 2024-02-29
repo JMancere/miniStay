@@ -325,7 +325,6 @@ const validateCreate = [
 router.post('/', requireAuth, validateCreate,
   async (req, res) => {
 
-
     const {address, city, state, country, lat, lng, name, description, price} = req.body
     const spot = await Spot.create({
       address, city, state, country, lat, lng, name, description, price, ownerId: req.user.id,
@@ -416,9 +415,120 @@ router.post('/:spotId/reviews', requireAuth, stub,
 );
 
 
+const validateEdit = [
+  //const {, , , , , name, description, price} = req.body
+  body('address')
+      .optional()
+      .exists({ checkFalsy: true })
+      .withMessage('Street address is required'),
+  body('address')
+      .optional()
+      .isLength({ max: 255 })
+      .withMessage('Street address is required'),
+  body('city')
+      .optional()
+      .exists({ checkFalsy: true })
+      .withMessage('City is required'),
+  body('city')
+      .optional()
+      .isLength({ max: 255 })
+      .withMessage('City is required'),
+  body('state')
+  .optional()
+  .exists({ checkFalsy: true })
+      .withMessage('State is required'),
+  body('state')
+  .optional()
+  .isLength({ max: 255 })
+      .withMessage('State is required'),
+  body('country')
+  .optional()
+  .exists({ checkFalsy: true })
+      .withMessage('Country is required'),
+  body('lat')
+  .optional()
+  .isNumeric()
+      .custom(lat => {
+          return (lat >= -90 && lat <= 90)
+  })
+  .withMessage('Latitude must be within -90 and 90'),
+  body('lng')
+  .optional()
+  .isNumeric()
+      .custom(lng => {
+      return (lng >= -180 && lng <= 180)
+  })
+  .withMessage('Longitude must be within -180 and 180'),
+  body('name')
+  .optional()
+  .exists({ checkFalsy: true })
+      .withMessage('Name is required'),
+  body('name')
+  .optional()
+  .isLength({ max: 50 })
+      .withMessage('Name must be less than 50 characters'),
+  body('description')
+  .optional()
+  .exists({ checkFalsy: true })
+      .withMessage('Description is required'),
+  body('price')
+  .optional()
+  .isNumeric()
+      .custom(lng => {
+      return (lng >= 0)
+  })
+  .withMessage("Price per day must be a positive number"),
+  handleValidationErrors
+];
 //REQ AUTH - Edit a Spot
-router.put('/:spotId', requireAuth, stub,
-     (req, res) => {}
+router.put('/:spotId', requireAuth, validateEdit,
+  async (req, res) => {
+    const {spotId} = req.body
+
+    if (spotId === undefined){
+        const err = new Error("Spot couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    let spots = await Spot.findAll(
+        {
+            where: {id: spotId},
+        }
+    );
+
+    if (!spots || spots.length === 0){
+        const err = new Error("Spot couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+    const spot = spots[0]
+
+    if (spot.dataValues.ownerId !== req.user.id) {
+      const err = new Error("User not authorized.");
+      err.title = "Resource Not Found";
+      err.status = 401;
+      throw err;
+    }
+
+    const {address, city, state, country, lat, lng, name, description, price} = req.body
+    if (address) spot.address = address;
+    if (city) spot.city = city;
+    if (state) spot.state = state;
+    if (country) spot.country = country;
+    if (lat) spot.lat = lat;
+    if (lng) spot.lng = lng;
+    if (name) spot.name = name;
+    if (description) spot.description = description;
+    if (price) spot.price = price;
+    spot.save();
+
+    return res.json({
+      spot
+    });
+  }
 );
 
 
