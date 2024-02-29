@@ -7,10 +7,11 @@ const { User } = require('../../db/models');
 const { Spot } = require('../../db/models');
 const { Review } = require('../../db/models');
 const { Booking } = require('../../db/models');
-
+const {ReviewImage} = require('../../db/models');
+const {SpotImage} = require('../../db/models');
  const { check, body } = require('express-validator');
  const { handleValidationErrors } = require('../../utils/validation');
-const { stub } = require('../../utils/utils');
+ const { stub } = require('../../utils/utils');
 
 
 const calcPreviewAndAvgReview = (spots, option) => {
@@ -105,14 +106,13 @@ router.get('/current', requireAuth,
 //Get details of a Spot from an id
 router.get('/:spotId',
   async (req, res) => {
-    const {spotId} = req.body
+     const {spotId} = req.body
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
     }
-
 
     let spots = await Spot.findAll(
         {
@@ -195,7 +195,6 @@ router.get('/:spotId/reviews',
         })
         delete review.dataValues.User.dataValues.username;
     });
-
     return res.json({
         reviews
     });
@@ -328,14 +327,81 @@ router.post('/', requireAuth, validateCreate,
 
 
     const {address, city, state, country, lat, lng, name, description, price} = req.body
-    const s = await Spot.create({
+    const spot = await Spot.create({
       address, city, state, country, lat, lng, name, description, price, ownerId: req.user.id,
       });
 
+    //Created.
+    res.statusCode = 201;
     return res.json({
-        s
+        spot
     });
    }
+);
+
+const validateSpotImg = [
+  //const {, , , , , name, description, price} = req.body
+  body('url')
+      .exists({ checkFalsy: true })
+      .withMessage('URL is required'),
+  body('url')
+      .isLength({ max: 255 })
+      .withMessage('Street address is required'),
+  body('preview')
+      //.exists({ checkFalsy: true })
+      .isBoolean()
+      .withMessage('Preview is required'),
+  handleValidationErrors
+];
+
+//REQ AUTH - Create an Image for a Spot
+router.post('/:spotId/images', requireAuth, validateSpotImg,
+  async (req, res) => {
+    const {spotId} = req.body
+
+    if (spotId === undefined){
+        const err = new Error("Spot couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    let spots = await Spot.findAll(
+        {
+            where: {id: spotId},
+        }
+    );
+
+    if (!spots || spots.length === 0){
+        const err = new Error("Spot couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+    const spot = spots[0]
+
+    if (spot.dataValues.ownerId !== req.user.id) {
+      const err = new Error("User not authorized.");
+      err.title = "Resource Not Found";
+      err.status = 401;
+      throw err;
+    }
+
+    const {url, preview} = req.body
+
+    const ri = await SpotImage.create({
+      url, preview, spotId
+      });
+
+    delete ri.dataValues.spotId
+    delete ri.dataValues.updatedAt
+    delete ri.dataValues.createdAt
+
+    return res.json({
+      ri
+  });
+
+  }
 );
 
 //REQ AUTH - Create a Booking
@@ -349,10 +415,6 @@ router.post('/:spotId/reviews', requireAuth, stub,
      (req, res) => {}
 );
 
-//REQ AUTH - Create an Image for a Spot
-router.post('/:spotId/images', requireAuth, stub,
-     (req, res) => {}
-);
 
 //REQ AUTH - Edit a Spot
 router.put('/:spotId', requireAuth, stub,
