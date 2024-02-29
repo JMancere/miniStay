@@ -8,8 +8,8 @@ const { Spot } = require('../../db/models');
 const { Review } = require('../../db/models');
 const { Booking } = require('../../db/models');
 
-// const { check } = require('express-validator');
-// const { handleValidationErrors } = require('../../utils/validation');
+ const { check, body } = require('express-validator');
+ const { handleValidationErrors } = require('../../utils/validation');
 const { stub } = require('../../utils/utils');
 
 
@@ -107,7 +107,7 @@ router.get('/:spotId',
   async (req, res) => {
     const {spotId} = req.body
     if (spotId === undefined){
-        const err = new Error(`Spot does not exist with id of ${spotId}.`);
+        const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
@@ -122,7 +122,7 @@ router.get('/:spotId',
     );
 
     if (!spots || spots.length === 0){
-        const err = new Error(`Spot does not exist with id ${spotId}.`);
+        const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
@@ -155,7 +155,7 @@ router.get('/:spotId/reviews',
     const {spotId} = req.body
 
     if (spotId === undefined){
-        const err = new Error(`Spot does not exist with id of ${spotId}.`);
+        const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
@@ -168,7 +168,7 @@ router.get('/:spotId/reviews',
     );
 
     if (!spots || spots.length === 0){
-        const err = new Error(`Spot does not exist with id ${spotId}.`);
+        const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
@@ -209,7 +209,7 @@ router.get('/:spotId/bookings', requireAuth,
     const {spotId} = req.body
 
     if (spotId === undefined){
-        const err = new Error(`Spot does not exist with id of ${spotId}.`);
+        const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
@@ -222,7 +222,7 @@ router.get('/:spotId/bookings', requireAuth,
     );
 
     if (!spots || spots.length === 0){
-        const err = new Error(`Spot does not exist with id ${spotId}.`);
+        const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
         err.status = 404;
         throw err;
@@ -270,13 +270,82 @@ router.get('/:spotId/bookings', requireAuth,
    }
 );
 
-//REQ AUTH - Edit a Spot
-router.put('/:spotId', requireAuth, stub,
-     (req, res) => {}
+const validateCreate = [
+    //const {, , , , , name, description, price} = req.body
+    body('address')
+        .exists({ checkFalsy: true })
+        .withMessage('Street address is required'),
+    body('address')
+        .isLength({ max: 255 })
+        .withMessage('Street address is required'),
+    body('city')
+        .exists({ checkFalsy: true })
+        .withMessage('City is required'),
+    body('city')
+        .isLength({ max: 255 })
+        .withMessage('City is required'),
+    body('state')
+        .exists({ checkFalsy: true })
+        .withMessage('State is required'),
+    body('state')
+        .isLength({ max: 255 })
+        .withMessage('State is required'),
+    body('country')
+        .exists({ checkFalsy: true })
+        .withMessage('Country is required'),
+    body('lat')
+        .isNumeric()
+        .custom(lat => {
+            return (lat >= -90 && lat <= 90)
+    })
+    .withMessage('Latitude must be within -90 and 90'),
+    body('lng')
+        .isNumeric()
+        .custom(lng => {
+        return (lng >= -180 && lng <= 180)
+    })
+    .withMessage('Longitude must be within -180 and 180'),
+    body('name')
+        .exists({ checkFalsy: true })
+        .withMessage('Name is required'),
+    body('name')
+        .isLength({ max: 50 })
+        .withMessage('Name must be less than 50 characters'),
+    body('description')
+        .exists({ checkFalsy: true })
+        .withMessage('Description is required'),
+    body('price')
+        .isNumeric()
+        .custom(lng => {
+        return (lng >= 0)
+    })
+    .withMessage("Price per day must be a positive number"),
+    handleValidationErrors
+  ];
+//REQ AUTH - Create a Spot
+router.post('/', requireAuth, validateCreate,
+  async (req, res) => {
+
+
+    const {address, city, state, country, lat, lng, name, description, price} = req.body
+    const s = await Spot.create({
+      address, city, state, country, lat, lng, name, description, price, ownerId: req.user.id,
+      });
+
+    return res.json({
+        s
+    });
+   }
 );
 
-//REQ AUTH - Create a Spot
-router.post('/', requireAuth, stub,
+//REQ AUTH - Create a Booking
+router.post('/:spotId/bookings', requireAuth, stub,
+     (req, res) => {}
+
+);
+
+//REQ AUTH - Create a Review for a Spot
+router.post('/:spotId/reviews', requireAuth, stub,
      (req, res) => {}
 );
 
@@ -285,15 +354,11 @@ router.post('/:spotId/images', requireAuth, stub,
      (req, res) => {}
 );
 
-//REQ AUTH - Create a Review for a Spot
-router.post('/:spotId/reviews', requireAuth, stub,
+//REQ AUTH - Edit a Spot
+router.put('/:spotId', requireAuth, stub,
      (req, res) => {}
 );
 
-//REQ AUTH - Create a Booking
-router.post('/:spotId/bookings', requireAuth, stub,
-     (req, res) => {}
-);
 
 //REQ AUTH - Delete a Spot
 router.delete('/:spotId', requireAuth, stub,

@@ -42,12 +42,14 @@ module.exports = {
         type: Sequelize.FLOAT
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(50)
       },
       description: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       price: {
+        allowNull: false,
         type: Sequelize.FLOAT
       },
       createdAt: {
