@@ -27,9 +27,11 @@ module.exports = {
       },
       review: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       stars: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

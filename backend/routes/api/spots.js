@@ -409,11 +409,73 @@ router.post('/:spotId/bookings', requireAuth, stub,
 
 );
 
-//REQ AUTH - Create a Review for a Spot
-router.post('/:spotId/reviews', requireAuth, stub,
-     (req, res) => {}
-);
 
+const validateReviewCreate = [
+  //const {, , , , , name, description, price} = req.body
+  body('review')
+      .exists({ checkFalsy: true })
+      .withMessage('Review text is required'),
+  body('review')
+      .isLength({ max: 255 })
+      .withMessage('Review text is required'),
+  body('stars')
+      .isInt()
+      .custom(i => {
+      return (i > 0 && i < 6)
+  })
+  .withMessage("Stars must be an integer from 1 to 5"),
+  handleValidationErrors
+];
+//REQ AUTH - Create a Review for a Spot
+router.post('/:spotId/reviews', requireAuth, validateReviewCreate,
+  async (req, res) => {
+    const {spotId} = req.body
+
+    if (spotId === undefined){
+      const err = new Error("Spot couldn't be found");
+      err.title = "Resource Not Found";
+      err.status = 404;
+      throw err;
+  }
+
+  let spots = await Spot.findAll(
+      {
+          where: {id: spotId},
+      }
+  );
+
+  if (!spots || spots.length === 0){
+      const err = new Error("Spot couldn't be found");
+      err.title = "Resource Not Found";
+      err.status = 404;
+      throw err;
+  }
+  const spot = spots[0]
+
+  let reviews = await Review.findAll(
+    {
+      where: {spotId: spotId, userId: req.user.id},
+      //include: ['ReviewImages', 'User']
+    }
+  );
+  if (reviews.length > 0) {
+    const err = new Error("User already has a review for this spot");
+    err.title = "Resource Not Found";
+    err.status = 403;
+    throw err;
+  }
+
+  const {review, stars} = req.body
+
+  const review_ = await Review.create({userId: req.user.id, spotId, review, stars})
+
+  res.statusCode = 201;
+  return res.json({
+    review_
+  });
+
+  }
+);
 
 const validateEdit = [
   //const {, , , , , name, description, price} = req.body
@@ -523,7 +585,7 @@ router.put('/:spotId', requireAuth, validateEdit,
     if (name) spot.name = name;
     if (description) spot.description = description;
     if (price) spot.price = price;
-    spot.save();
+    await spot.save();
 
     return res.json({
       spot
@@ -533,8 +595,45 @@ router.put('/:spotId', requireAuth, validateEdit,
 
 
 //REQ AUTH - Delete a Spot
-router.delete('/:spotId', requireAuth, stub,
-    (req, res) => {}
+router.delete('/:spotId', requireAuth,
+  async (req, res) => {
+    const {spotId} = req.body
+
+    if (spotId === undefined){
+        const err = new Error("Spot couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    let spots = await Spot.findAll(
+        {
+            where: {id: spotId},
+        }
+    );
+
+    if (!spots || spots.length === 0){
+        const err = new Error("Spot couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+    const spot = spots[0]
+
+    if (spot.dataValues.ownerId !== req.user.id) {
+      const err = new Error("User not authorized.");
+      err.title = "Resource Not Found";
+      err.status = 401;
+      throw err;
+    }
+
+    await spot.destroy();
+
+    return res.json(
+      {
+        message: "Successfully deleted"
+    });
+  }
 );
 
 
