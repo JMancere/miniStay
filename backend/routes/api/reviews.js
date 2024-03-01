@@ -111,12 +111,46 @@ router.post('/:reviewId/images', requireAuth, validateReviewImg,
 
 //REQ AUTH - Edit a Review
 router.put('/:reviewId', requireAuth, stub,
-  (req, res) => {}
+  (req, res) => {
+    const {reviewId} = req.body
+  }
 );
 
 //REQ AUTH - Delete a Review
-router.delete('/:reviewId', requireAuth, stub,
-  (req, res) => {}
+router.delete('/:reviewId', requireAuth,
+  async (req, res) => {
+    const {reviewId} = req.body
+
+    if (reviewId === undefined){
+        const err = new Error("Review couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+
+    let reviews = await Review.findAll(
+      {
+          where: {userId: req.user.id, id: reviewId},
+          include: ['Spot', 'ReviewImages']
+      }
+    );
+
+    if (reviews.length === 0){
+      res.statusCode = 404
+      return res.json({
+        "message": "Review couldn't be found"
+      })
+    }
+
+    const review = reviews[0]
+
+    await review.destroy();
+
+    return res.json(
+      {
+        message: "Successfully deleted"
+    });
+  }
 );
 
 module.exports = router;
