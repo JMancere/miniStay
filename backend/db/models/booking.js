@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
         attributes: {
           //exclude: ["createdAt", "updatedAt"]
         }
-        },
+      },
     }
 });
   return Booking;

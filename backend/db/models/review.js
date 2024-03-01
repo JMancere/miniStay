@@ -49,6 +49,13 @@ module.exports = (sequelize, DataTypes) => {
         //exclude: ["createdAt", "updatedAt"]
       }
     },
+    // scopes: {
+    //   isOwner: {
+    //     attributes: {
+    //       //exclude: ["createdAt", "updatedAt"]
+    //     }
+    //   },
+    // }
   });
   return Review;
 };
