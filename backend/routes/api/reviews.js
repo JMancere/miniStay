@@ -2,30 +2,14 @@ const express = require('express');
 const router = express.Router();
 // const { Op } = require('sequelize');
 
+const { body } = require('express-validator');
+
 const { requireAuth } = require('../../utils/auth');
 const { Review } = require('../../db/models');
 const { SpotImage } = require('../../db/models');
+const { ReviewImage } = require('../../db/models');
 
-
-
-const helper = async (spotId) => {
-  let pi = await SpotImage.findAll(
-      {
-          where: {
-            spotId,
-            preview: true
-          },
-      }
-    );
-  if (pi.length > 0){
-      console.log('11111111', pi[0].dataValues.url)
-      return pi[0].dataValues.url;
-  } else
-    return ""
-}
-
-// const { check } = require('express-validator');
-// const { handleValidationErrors } = require('../../utils/validation');
+const { handleValidationErrors } = require('../../utils/validation');
 const { stub } = require('../../utils/utils');
 
 //REQ AUTH - Get Reviews of Current User
@@ -35,102 +19,94 @@ router.get('/current', requireAuth,
     let reviews = await Review.findAll(
       {
           where: {userId: req.user.id},
-          //include: ['Reviews', 'SpotImages', 'User']
           include: ['Spot', 'ReviewImages']
       }
-  );
-
-  for (let i = 0; i < reviews.length - 1; i++){
-    const review = reviews[i];
-    review.dataValues.ReviewImages.forEach(s => {
-      delete s.dataValues.reviewId
-    })
-
-    review.dataValues.User = {
-      id:req.user.id,
-      firstName:req.user.firstName,
-      lastName:req.user.lastName
-    };
-    //review.dataValues.Spot.dataValues.pi = 'asdasdasfbnoidfsgodihgldfsgsdfgop'
-    //filter out spot stuff.
-    //console.log('adasdasdasdasd',  review.dataValues.Spot)
-    delete review.dataValues.Spot.dataValues.description
-    delete review.dataValues.Spot.dataValues.createdAt
-    delete review.dataValues.Spot.dataValues.updatedAt
-
-    //get previewimage.
-
-    let pi = await SpotImage.findAll(
-      {
-          where: {
-            spotId: review.dataValues.Spot.dataValues.id,
-            preview: true
-          },
-      }
     );
-    //let pi = helper(review.dataValues.Spot.dataValues.id)
-    console.log(pi)
-    if (pi.length > 0){
-      review.dataValues.Spot.dataValues.preview = pi[0].dataValues.url
-    } else
-      review.dataValues.Spot.dataValues.preview = ''
-  }
 
+    //forEach does not allow await calls. must use regular loop.
+    for (let i = 0; i < reviews.length - 1; i++){
+      const review = reviews[i];
+      review.dataValues.ReviewImages.forEach(s => {
+        delete s.dataValues.reviewId
+      })
 
-  // reviews.forEach(review => {
-  //   review.dataValues.ReviewImages.forEach(s => {
-  //         delete s.dataValues.reviewId
-  //   })
+      review.dataValues.User = {
+        id:req.user.id,
+        firstName:req.user.firstName,
+        lastName:req.user.lastName
+      };
+      delete review.dataValues.Spot.dataValues.description
+      delete review.dataValues.Spot.dataValues.createdAt
+      delete review.dataValues.Spot.dataValues.updatedAt
 
-  //   review.dataValues.User = {
-  //     id:req.user.id,
-  //     firstName:req.user.firstName,
-  //     lastName:req.user.lastName
-  //   };
-  //   //review.dataValues.Spot.dataValues.pi = 'asdasdasfbnoidfsgodihgldfsgsdfgop'
-  //   //filter out spot stuff.
-  //   //console.log('adasdasdasdasd',  review.dataValues.Spot)
-  //   delete review.dataValues.Spot.dataValues.description
-  //   delete review.dataValues.Spot.dataValues.createdAt
-  //   delete review.dataValues.Spot.dataValues.updatedAt
+      //get previewimage.
 
-  //   //get previewimage.
+      let pi = await SpotImage.findAll(
+        {
+            where: {
+              spotId: review.dataValues.Spot.dataValues.id,
+              preview: true
+            },
+        }
+      );
+      if (pi.length > 0){
+        review.dataValues.Spot.dataValues.preview = pi[0].dataValues.url
+      } else
+        review.dataValues.Spot.dataValues.preview = ''
+    }
 
-  //   // let pi = await SpotImage.findAll(
-  //   //   {
-  //   //       where: {
-  //   //         spotId: review.dataValues.Spot.dataValues.id,
-  //   //         preview: true
-  //   //       },
-  //   //   }
-  //   // );
-  //   let pi = helper(review.dataValues.Spot.dataValues.id)
-  //   //console.log(pi)
-  //   review.dataValues.Spot.dataValues.pi = pi//'asdasdasfbnoidfsgodihgldfsgsdfgop'
-
-  // });
-
-// if (spots){
-  //     const options = {previewImage: true, avgRating: true};
-  //     calcPreviewAndAvgReview(spots, options);
-
-  //     //Remove spotimages and reviews from resultset.
-  //     spots.forEach(spot => {
-  //         delete spot.dataValues.SpotImages
-  //         delete spot.dataValues.Reviews
-  //     });
-  // }
-  return res.json({
-      reviews
-  });
-
-
+    return res.json({
+        reviews
+    });
   }
 );
 
+const validateReviewImg = [
+  body('url')
+      .exists({ checkFalsy: true })
+      .withMessage('URL is required'),
+  body('url')
+      .isLength({ max: 255 })
+      .withMessage('Street address is required'),
+  handleValidationErrors
+];
+//1 created spot 16
+//user4 added review 9 for spot 16.
+
 //REQ AUTH - Create an Image for a Review
-router.post('/:reviewId/images', requireAuth, stub,
-  (req, res) => {}
+router.post('/:reviewId/images', requireAuth, validateReviewImg,
+  async (req, res) => {
+    const {reviewId, url} = req.body
+
+    let reviews = await Review.findAll(
+      {
+          where: {userId: req.user.id, id: reviewId},
+          include: ['Spot', 'ReviewImages']
+      }
+    );
+
+    if (reviews.length === 0){
+      res.statusCode = 404
+      return res.json({
+        "message": "Review couldn't be found"
+      })
+    }
+    if (reviews[0].dataValues.ReviewImages.length >= 10){
+      res.statusCode = 403
+      return res.json({
+        "message": "Maximum number of images for this resource was reached"
+      })
+    }
+
+    const ri = await ReviewImage.create({reviewId, url})
+
+    res.statusCode = 200;
+    return res.json({
+      id: ri.id,
+      url
+    });
+
+  }
 );
 
 //REQ AUTH - Edit a Review

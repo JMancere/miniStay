@@ -566,7 +566,7 @@ router.post('/:spotId/reviews', requireAuth, validateReviewCreate,
       err.status = 404;
       throw err;
   }
-  const spot = spots[0]
+  //const spot = spots[0]
 
   let reviews = await Review.findAll(
     {
