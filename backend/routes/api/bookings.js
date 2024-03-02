@@ -51,20 +51,6 @@ router.get('/current', requireAuth,
   }
 );
 
-/*
-{
-    "booking": {
-        "id": 25,
-        "spotId": 1,
-        "userId": 4,
-        "startDate": "2027-01-05T00:00:00.000Z",
-        "endDate": "2027-12-15T00:00:00.000Z",
-        "updatedAt": "2024-03-02T18:09:55.625Z",
-        "createdAt": "2024-03-02T18:09:55.625Z"
-    }
-}
-*/
-
 const validateEditBooking = [
   body('startDate')
     .optional()
