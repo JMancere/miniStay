@@ -109,11 +109,67 @@ router.post('/:reviewId/images', requireAuth, validateReviewImg,
   }
 );
 
+const validateReviewEdit = [
+  //const {, , , , , name, description, price} = req.body
+  body('review')
+    .optional()
+    .exists({ checkFalsy: true })
+    .withMessage('Review text is required'),
+  body('review')
+    .optional()
+    .isLength({ max: 255 })
+    .withMessage('Review text is required'),
+  body('stars')
+    .optional()
+    .isInt()
+    .custom(i => {
+    return (i > 0 && i < 6)
+  })
+  .withMessage("Stars must be an integer from 1 to 5"),
+  handleValidationErrors
+];
 //REQ AUTH - Edit a Review
-router.put('/:reviewId', requireAuth, stub,
-  (req, res) => {
+router.put('/:reviewId', requireAuth, validateReviewEdit,
+  async (req, res) => {
     const {reviewId} = req.body
+    if (reviewId === undefined){
+      const err = new Error("Review couldn't be found");
+      err.title = "Resource Not Found";
+      err.status = 404;
+      throw err;
+    }
+
+    let reviews = await Review.findAll(
+        {
+            where: {id: reviewId},
+        }
+    );
+
+    if (!reviews || reviews.length === 0){
+        const err = new Error("Review couldn't be found");
+        err.title = "Resource Not Found";
+        err.status = 404;
+        throw err;
+    }
+    const review_ = reviews[0]
+
+    if (review_.dataValues.userId !== req.user.id) {
+      const err = new Error("User not authorized.");
+      err.title = "Resource Not Found";
+      err.status = 401;
+      throw err;
+    }
+
+    const {review, stars} = req.body
+    if (review) review_.review = review;
+    if (stars) review_.stars = stars;
+    await review_.save();
+
+    return res.json({
+      review_
+    });
   }
+
 );
 
 //REQ AUTH - Delete a Review
