@@ -228,7 +228,6 @@ router.get('/:spotId/bookings', requireAuth,
         throw err;
     }
 
-    //console.log('111111', spots[0].dataValues.ownerId)
     const isOwner = req.user.id === spots[0].dataValues.ownerId;
 
     let bookings;
@@ -250,11 +249,9 @@ router.get('/:spotId/bookings', requireAuth,
             }
         );
     }
-    //console.log('sdsdsdsdsds', bookings)
     bookings.forEach(booking => {
         //Are we the owner of this spot?
         //const isOwner = req.user.id === booking.dataValues.Spot.dataValues.ownerId;
-        //console.log('111111', booking.dataValues.Spot.dataValues.ownerId)
 
         if (isOwner){
             delete booking.dataValues.User.dataValues.username;

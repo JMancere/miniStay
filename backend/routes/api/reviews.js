@@ -24,7 +24,7 @@ router.get('/current', requireAuth,
     );
 
     //forEach does not allow await calls. must use regular loop.
-    for (let i = 0; i < reviews.length - 1; i++){
+    for (let i = 0; i < reviews.length; i++){
       const review = reviews[i];
       review.dataValues.ReviewImages.forEach(s => {
         delete s.dataValues.reviewId
