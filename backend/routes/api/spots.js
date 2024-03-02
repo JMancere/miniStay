@@ -48,12 +48,133 @@ const calcPreviewAndAvgReview = (spots, option) => {
 
 };
 
-//Get all Spots
-router.get('/',
+const validateQparams = [
+  //const {, , , , , name, description, price} = req.body
+  check('page')
+    .optional()
+    .isNumeric()
+    .custom(p => {
+      return (p >= 1 && p <= 10)
+    })
+    .withMessage('Page must be greater than or equal to 1'),
+  check('size')
+    .optional()
+    .isNumeric()
+    .custom(p => {
+        return (p >= 1 && p <= 20)
+    })
+    .withMessage('Size must be greater than or equal to 1'),
+  check('minLat')
+    .optional()
+    .isNumeric()
+    .custom(lat => {
+      return (lat >= -90 && lat <= 90)
+    })
+  .withMessage('Minimum latitude is invalid'),
+    check('maxLat')
+    .optional()
+    .isNumeric()
+    .custom(lat => {
+      return (lat >= -90 && lat <= 90)
+    })
+    .withMessage('Maximum latitude is invalid'),
+  check('minLng')
+    .optional()
+    .isNumeric()
+    .custom(lat => {
+      return (lat >= -180 && lat <= 180)
+    })
+    .withMessage('Minimum longitude is invalid'),
+  check('maxLng')
+  .optional()
+  .isNumeric()
+      .custom(lat => {
+        return (lat >= -180 && lat <= 180)
+      })
+  .withMessage('Maximum longitude is invalid'),
+  check('minPrice')
+  .optional()
+  .isNumeric()
+      .custom(lng => {
+      return (lng >= 0)
+  })
+  .withMessage("Minimum price must be greater than or equal to 0"),
+  check('maxPrice')
+  .optional()
+  .isNumeric()
+      .custom(lng => {
+      return (lng >= 0)
+  })
+  .withMessage("Maximum price must be greater than or equal to 0"),
+  handleValidationErrors
+];//Get all Spots
+router.get('/', validateQparams,
   async (req, res) => {
+    let { page, size } = req.query;
+
+    page = parseInt(page);
+    size = parseInt(size);
+
+    if (Number.isNaN(page)) page = 1;
+    if (Number.isNaN(size)) size = 20;
+
+    const where = {}
+    let { minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+
+    if (minLat && maxLat) {
+      where.lat = {
+        [Op.gte]: minLat,
+        [Op.lte]: maxLat
+      }
+    } else if (minLat){
+      where.lat = {
+        [Op.gte]: minLat,
+      }
+
+    } else if (maxLat){
+      where.lat = {
+        [Op.lte]: maxLat
+      }
+    }
+
+    if (minLng && maxLng) {
+      where.lng = {
+        [Op.gte]: minLng,
+        [Op.lte]: maxLng
+      }
+    } else if (minLng){
+      where.lng = {
+        [Op.gte]: minLng,
+      }
+
+    } else if (maxLng){
+      where.lng = {
+        [Op.lte]: maxLng
+      }
+    }
+
+    if (minPrice && maxPrice) {
+      where.price = {
+        [Op.gte]: minPrice,
+        [Op.lte]: maxPrice
+      }
+    } else if (minPrice){
+      where.price = {
+        [Op.gte]: minPrice,
+      }
+
+    } else if (maxPrice){
+      where.price = {
+        [Op.lte]: maxPrice
+      }
+    }
+
     let spots = await Spot.findAll(
         {
-            include: ['Reviews', 'SpotImages']
+          limit: size,
+          offset: size * (page - 1),
+          include: ['Reviews', 'SpotImages'],
+          where
             //If you include the where clause it will only return spots that have preview.
             //So, if a spot does not have preview, it wont list. Which is not what we want.
             //include: ['Reviews', { model: SpotImage, where: {preview: true}}],
@@ -105,9 +226,7 @@ router.get('/current', requireAuth,
 //Get details of a Spot from an id
 router.get('/:spotId', //(req, res, next) => {req.temp = 'WOW'; next();},
   async (req, res) => {
-
-    //console.log('yytytytytytyt', req.temp)
-     const {spotId} = req.body
+    const {spotId} = req.body
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
@@ -482,7 +601,6 @@ router.post('/:spotId/bookings', requireAuth, validateCreateBooking,
         }
       }
     });
-    console.log(booking, booking.length)
 
     if (booking.length > 0){
       hasErrors = true;

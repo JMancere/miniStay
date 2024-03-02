@@ -135,7 +135,6 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
         }
       }
     });
-    //console.log(booking, booking.length)
 
     const errors = {};
     let hasErrors = false;
