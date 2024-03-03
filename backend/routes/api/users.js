@@ -14,11 +14,11 @@ const validateSignup = [
     check('email')
       .exists({ checkFalsy: true })
       .isEmail()
-      .withMessage('Please provide a valid email.'),
+      .withMessage('Invalid email'),
     check('username')
       .exists({ checkFalsy: true })
       .isLength({ min: 4 })
-      .withMessage('Please provide a username with at least 4 characters.'),
+      .withMessage('Username is required'),
     check('username')
       .not()
       .isEmail()
@@ -29,16 +29,16 @@ const validateSignup = [
       .withMessage('Password must be 6 characters or more.'),
       check('lastName')
       .isAlpha()
-      .withMessage('Last Name must be alpha only.'),
+      .withMessage('Last Name is required'),
     check('lastName')
       .notEmpty({ min: 6 })
-      .withMessage('Last name must not be empty'),
+      .withMessage('Last Name is required'),
     check('firstName')
       .isAlpha()
-      .withMessage('First Name must be alpha only.'),
+      .withMessage('First Name is required'),
     check('firstName')
       .notEmpty({ min: 6 })
-      .withMessage('First name must not be empty'),
+      .withMessage('First Name is required'),
     handleValidationErrors
   ];
 
@@ -56,7 +56,7 @@ router.post(
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      //username: user.username,
+      username: user.username,
     };
 
     await setTokenCookie(res, safeUser);
