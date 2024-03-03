@@ -633,7 +633,14 @@ router.post('/:spotId/bookings', requireAuth, validateCreateBooking,
         },
       }
     });
+/*
+5 2030 11 22 2030 9 22 9 23
+  2030 11 26 2030 9 26 9 25
 
+6 2030 10 22
+  2030 10 26
+
+*/
     if (booking.length > 0){
       hasErrors = true;
       errors["startDate"] = "Start date conflicts with an existing booking";

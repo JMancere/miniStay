@@ -176,6 +176,9 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
 
     booking_ = await Booking.findAll({
       where: {
+        id: {
+          [Op.not]: booking.dataValues.id
+        },
         spotId,
         startDate:{
           [Op.between]: [new Date(newStart), new Date(newEnd)]
