@@ -14,7 +14,7 @@ const { ReviewImage } = require('../../db/models');
 //REQ AUTH - Delete a Review Image
 router.delete('/:imageId', requireAuth,
   async (req, res) => {
-    const {imageId} = req.body
+    const {imageId} = req.params
 
     if (imageId === undefined){
         const err = new Error("Review Image couldn't be found");
@@ -39,9 +39,9 @@ router.delete('/:imageId', requireAuth,
     const img = imgs[0]
 
     if (img.dataValues.Review.dataValues.userId != req.user.id){
-      res.statusCode = 401
+      res.statusCode = 403
       return res.json({
-        "message": "User not authorized."
+        "message": "Forbidden"
       })
     }
 

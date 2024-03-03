@@ -12,7 +12,7 @@ const { SpotImage } = require('../../db/models');
 //REQ AUTH - Delete a Spot Image
 router.delete('/:imageId', requireAuth,
   async (req, res) => {
-    const {imageId} = req.body
+    const {imageId} = req.params
 
     if (imageId === undefined){
         const err = new Error("Spot Image couldn't be found");
@@ -37,9 +37,9 @@ router.delete('/:imageId', requireAuth,
     const img = imgs[0]
 
     if (img.dataValues.Spot.dataValues.ownerId != req.user.id){
-      res.statusCode = 401
+      res.statusCode = 403
       return res.json({
-        "message": "User not authorized."
+        "message": "Forbidden"
       })
     }
 

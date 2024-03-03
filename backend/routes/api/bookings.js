@@ -67,7 +67,7 @@ const validateEditBooking = [
 //REQ AUTH - Edit a Booking
 router.put('/:bookingId', requireAuth, validateEditBooking,
   async (req, res) => {
-    const {bookingId} = req.body
+    const {bookingId} = req.params;
     if (bookingId === undefined){
       const err = new Error("Booking couldn't be found");
       err.title = "Resource Not Found";
@@ -90,9 +90,9 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
     const booking = bookings[0]
 
     if (booking.dataValues.userId !== req.user.id) {
-      const err = new Error("User not authorized.");
+      const err = new Error("Forbidden.");
       err.title = "Resource Not Found";
-      err.status = 401;
+      err.status = 403;
       throw err;
     }
 
@@ -174,6 +174,20 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
       errors["endDate"] = "End date conflicts with an existing booking";
     }
 
+    booking_ = await Booking.findAll({
+      where: {
+        spotId,
+        startDate:{
+          [Op.between]: [new Date(newStart), new Date(newEnd)]
+        },
+      }
+    });
+
+    if (booking_.length > 0){
+      hasErrors = true;
+      errors["startDate"] = "Start date conflicts with an existing booking";
+    }
+
     if (hasErrors){
       res.statusCode = 403;
       return res.json({
@@ -181,6 +195,9 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
         errors: errors,
         });
     }
+
+
+
     if (startDate) booking.startDate = startDate;
     if (endDate) booking.endDate = endDate;
 
@@ -195,7 +212,7 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
 //REQ AUTH - Delete a Booking
 router.delete('/:bookingId', requireAuth,
   async (req, res) => {
-    const {bookingId} = req.body
+    const {bookingId} = req.params
 
     if (bookingId === undefined){
         const err = new Error("Booking couldn't be found");
@@ -206,7 +223,7 @@ router.delete('/:bookingId', requireAuth,
 
     let bookings = await Booking.scope('isOwner').findAll(
       {
-        where: {userId: req.user.id, id: bookingId},
+        where: {id: bookingId},
       }
     );
 
@@ -218,6 +235,13 @@ router.delete('/:bookingId', requireAuth,
     }
 
     const booking = bookings[0]
+
+    if (booking.dataValues.userId !== req.user.id) {
+      const err = new Error("Forbidden.");
+      err.title = "Resource Not Found";
+      err.status = 403;
+      throw err;
+    }
 
     let start = booking.dataValues.startDate;
     if (new Date() > start){

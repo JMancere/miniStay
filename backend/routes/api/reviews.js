@@ -76,12 +76,14 @@ const validateReviewImg = [
 //REQ AUTH - Create an Image for a Review
 router.post('/:reviewId/images', requireAuth, validateReviewImg,
   async (req, res) => {
-    const {reviewId, url} = req.body
+    const {reviewId} = req.params
+    const {url} = req.body
 
     let reviews = await Review.findAll(
       {
-          where: {userId: req.user.id, id: reviewId},
-          include: ['Spot', 'ReviewImages']
+        //where: {userId: req.user.id, id: reviewId},
+        where: {id: reviewId},
+        include: ['Spot', 'ReviewImages']
       }
     );
 
@@ -91,6 +93,14 @@ router.post('/:reviewId/images', requireAuth, validateReviewImg,
         "message": "Review couldn't be found"
       })
     }
+
+    if (reviews[0].dataValues.userId !== req.user.id) {
+      const err = new Error("Forbidden");
+      err.title = "Resource Not Found";
+      err.status = 403;
+      throw err;
+    }
+
     if (reviews[0].dataValues.ReviewImages.length >= 10){
       res.statusCode = 403
       return res.json({
@@ -131,7 +141,7 @@ const validateReviewEdit = [
 //REQ AUTH - Edit a Review
 router.put('/:reviewId', requireAuth, validateReviewEdit,
   async (req, res) => {
-    const {reviewId} = req.body
+    const {reviewId} = req.params
     if (reviewId === undefined){
       const err = new Error("Review couldn't be found");
       err.title = "Resource Not Found";
@@ -154,9 +164,9 @@ router.put('/:reviewId', requireAuth, validateReviewEdit,
     const review_ = reviews[0]
 
     if (review_.dataValues.userId !== req.user.id) {
-      const err = new Error("User not authorized.");
+      const err = new Error("Forbidden");
       err.title = "Resource Not Found";
-      err.status = 401;
+      err.status = 403;
       throw err;
     }
 
@@ -175,7 +185,7 @@ router.put('/:reviewId', requireAuth, validateReviewEdit,
 //REQ AUTH - Delete a Review
 router.delete('/:reviewId', requireAuth,
   async (req, res) => {
-    const {reviewId} = req.body
+    const {reviewId} = req.params
 
     if (reviewId === undefined){
         const err = new Error("Review couldn't be found");
@@ -186,7 +196,7 @@ router.delete('/:reviewId', requireAuth,
 
     let reviews = await Review.findAll(
       {
-          where: {userId: req.user.id, id: reviewId},
+          where: {id: reviewId},
           include: ['Spot', 'ReviewImages']
       }
     );
@@ -199,6 +209,13 @@ router.delete('/:reviewId', requireAuth,
     }
 
     const review = reviews[0]
+
+    if (review.dataValues.userId !== req.user.id) {
+      const err = new Error("Forbidden");
+      err.title = "Resource Not Found";
+      err.status = 403;
+      throw err;
+    }
 
     await review.destroy();
 

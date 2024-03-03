@@ -226,7 +226,7 @@ router.get('/current', requireAuth,
 //Get details of a Spot from an id
 router.get('/:spotId', //(req, res, next) => {req.temp = 'WOW'; next();},
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
         err.title = "Resource Not Found";
@@ -263,16 +263,14 @@ router.get('/:spotId', //(req, res, next) => {req.temp = 'WOW'; next();},
         lastName:req.user.lastName
     };
 
-    return res.json({
-        spots
-    });
+    return res.json(spots);
   }
 );
 
 //Get all Reviews by a Spot's id
 router.get('/:spotId/reviews',
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
 
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
@@ -302,10 +300,13 @@ router.get('/:spotId/reviews',
     );
 
     if (!reviews || reviews.length === 0){
-        const err = new Error(`Reviews do not exist for spot ${spotId}.`);
-        err.title = "Resource Not Found";
-        err.status = 404;
-        throw err;
+      return res.json({
+        reviews
+     });
+      // const err = new Error(`Reviews do not exist for spot ${spotId}.`);
+      //   err.title = "Resource Not Found";
+      //   err.status = 404;
+      //   throw err;
     }
 
     //const NeededUsers = {};
@@ -325,7 +326,7 @@ router.get('/:spotId/reviews',
 //REQ AUTH - Get All Bookings for a Spot
 router.get('/:spotId/bookings', requireAuth,
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
 
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
@@ -445,13 +446,13 @@ router.post('/', requireAuth, validateCreate,
     const {address, city, state, country, lat, lng, name, description, price} = req.body
     const spot = await Spot.create({
       address, city, state, country, lat, lng, name, description, price, ownerId: req.user.id,
-      });
+      })
 
+//      const spot = (await Model.create(modelObject)).get({plain:true})
     //Created.
     res.statusCode = 201;
-    return res.json({
-        spot
-    });
+    return res.json(spot);
+    //return res.json({spot});
    }
 );
 
@@ -473,7 +474,7 @@ const validateSpotImg = [
 //REQ AUTH - Create an Image for a Spot
 router.post('/:spotId/images', requireAuth, validateSpotImg,
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params;
 
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
@@ -497,9 +498,9 @@ router.post('/:spotId/images', requireAuth, validateSpotImg,
     const spot = spots[0]
 
     if (spot.dataValues.ownerId !== req.user.id) {
-      const err = new Error("User not authorized.");
+      const err = new Error("Forbidden");
       err.title = "Resource Not Found";
-      err.status = 401;
+      err.status = 403;
       throw err;
     }
 
@@ -513,9 +514,9 @@ router.post('/:spotId/images', requireAuth, validateSpotImg,
     delete ri.dataValues.updatedAt
     delete ri.dataValues.createdAt
 
-    return res.json({
+    return res.json(
       ri
-  });
+    );
 
   }
 );
@@ -534,7 +535,7 @@ const validateCreateBooking = [
 //REQ AUTH - Create a Booking
 router.post('/:spotId/bookings', requireAuth, validateCreateBooking,
   async (req, res, next) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
 
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
@@ -558,9 +559,9 @@ router.post('/:spotId/bookings', requireAuth, validateCreateBooking,
     const spot = spots[0]
 
     if (spot.dataValues.ownerId === req.user.id) {
-      const err = new Error("User not authorized.");
+      const err = new Error("Forbidden");
       err.title = "Resource Not Found";
-      err.status = 401;
+      err.status = 403;
       throw err;
     }
 
@@ -624,6 +625,23 @@ router.post('/:spotId/bookings', requireAuth, validateCreateBooking,
       errors["endDate"] = "End date conflicts with an existing booking";
     }
 
+    booking = await Booking.findAll({
+      where: {
+        spotId,
+        startDate:{
+          [Op.between]: [new Date(startDate), new Date(endDate)]
+        },
+      }
+    });
+
+    if (booking.length > 0){
+      hasErrors = true;
+      errors["startDate"] = "Start date conflicts with an existing booking";
+    }
+
+    //There could be a case where a booking lies solely in between the start date and end date.
+    //so in our start and end locate an existing start date between them.
+
     if (hasErrors){
       res.statusCode = 403;
       return res.json({
@@ -635,9 +653,7 @@ router.post('/:spotId/bookings', requireAuth, validateCreateBooking,
     booking = await Booking.create({
       spotId, userId: req.user.id, startDate, endDate
     });
-    return res.json({
-      booking
-    });
+    return res.json(booking);
   }
 );
 
@@ -660,7 +676,7 @@ const validateReviewCreate = [
 //REQ AUTH - Create a Review for a Spot
 router.post('/:spotId/reviews', requireAuth, validateReviewCreate,
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
 
     if (spotId === undefined){
       const err = new Error("Spot couldn't be found");
@@ -692,7 +708,7 @@ router.post('/:spotId/reviews', requireAuth, validateReviewCreate,
   if (reviews.length > 0) {
     const err = new Error("User already has a review for this spot");
     err.title = "Resource Not Found";
-    err.status = 403;
+    err.status = 500;
     throw err;
   }
 
@@ -701,9 +717,7 @@ router.post('/:spotId/reviews', requireAuth, validateReviewCreate,
   const review_ = await Review.create({userId: req.user.id, spotId, review, stars})
 
   res.statusCode = 201;
-  return res.json({
-    review_
-  });
+  return res.json(review_);
 
   }
 );
@@ -776,7 +790,7 @@ const validateEdit = [
 //REQ AUTH - Edit a Spot
 router.put('/:spotId', requireAuth, validateEdit,
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
 
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
@@ -800,9 +814,9 @@ router.put('/:spotId', requireAuth, validateEdit,
     const spot = spots[0]
 
     if (spot.dataValues.ownerId !== req.user.id) {
-      const err = new Error("User not authorized.");
+      const err = new Error("Forbidden");
       err.title = "Resource Not Found";
-      err.status = 401;
+      err.status = 403;
       throw err;
     }
 
@@ -818,16 +832,14 @@ router.put('/:spotId', requireAuth, validateEdit,
     if (price) spot.price = price;
     await spot.save();
 
-    return res.json({
-      spot
-    });
+    return res.json(spot);
   }
 );
 
 //REQ AUTH - Delete a Spot
 router.delete('/:spotId', requireAuth,
   async (req, res) => {
-    const {spotId} = req.body
+    const {spotId} = req.params
 
     if (spotId === undefined){
         const err = new Error("Spot couldn't be found");
@@ -851,9 +863,9 @@ router.delete('/:spotId', requireAuth,
     const spot = spots[0]
 
     if (spot.dataValues.ownerId !== req.user.id) {
-      const err = new Error("User not authorized.");
+      const err = new Error("Forbidden");
       err.title = "Resource Not Found";
-      err.status = 401;
+      err.status = 403;
       throw err;
     }
 
