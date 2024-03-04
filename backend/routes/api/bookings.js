@@ -45,8 +45,9 @@ router.get('/current', requireAuth,
         booking.dataValues.Spot.dataValues.previewImage = ''
     }
 
+    const Bookings = bookings;
     return res.json({
-        bookings
+        Bookings
     });
   }
 );
@@ -100,11 +101,11 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
     let newEnd = booking.dataValues.endDate
     const spotId = booking.dataValues.spotId;
 
-    //Error response with status 400 is given when it is past the booking's
-    //endDate (no editing of past bookings)
+    //Error response: Can't edit a booking that's past the end date
+    //Status Code: 403
     if (new Date() >newEnd){
       const err = new Error("Past bookings can't be modified");
-      err.title = "Resource Not Found";
+      //err.title = "Resource Not Found";
       err.status = 403;
       throw err;
     }
@@ -117,9 +118,6 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
     if (endDate) {
       newEnd = endDate;
     }
-
-    // Error response with status 403 is given when a booking already exists for
-    // the spot on the specified dates
 
     let booking_ = await Booking.findAll({
       where: {
@@ -139,6 +137,10 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
     const errors = {};
     let hasErrors = false;
 
+    /* Error response: Body validation errors
+       tatus Code: 400
+    */
+
     if (new Date(newStart) < new Date()) {
       hasErrors = true;
       errors["startDate"] = "startDate cannot be in the past";
@@ -149,6 +151,18 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
       errors["endDate"] = "endDate cannot be on or before startDate";
     }
 
+    if (hasErrors){
+      res.statusCode = 400;
+      return res.json({
+        //message: "Sorry, this spot is already booked for the specified dates",
+        message: "Bad Request",
+        errors: errors,
+        });
+    }
+
+    /* Error response: Booking conflict
+       tatus Code: 403
+    */
     if (booking_.length > 0){
       hasErrors = true;
       errors["startDate"] = "Start date conflicts with an existing booking";
@@ -206,9 +220,7 @@ router.put('/:bookingId', requireAuth, validateEditBooking,
 
     await booking.save();
 
-    return res.json({
-      booking
-    });
+    return res.json(booking);
   }
 );
 

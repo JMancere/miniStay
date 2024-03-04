@@ -190,8 +190,11 @@ router.get('/', validateQparams,
             delete spot.dataValues.Reviews
         });
     }
+    const Spots = spots;
     return res.json({
-        spots
+        Spots,
+        page,
+        size
     });
   }
 )
@@ -217,8 +220,9 @@ router.get('/current', requireAuth,
                 delete spot.dataValues.Reviews
             });
         }
+        const Spots = spots;
         return res.json({
-            spots
+            Spots
         });
     }
 );
@@ -263,7 +267,7 @@ router.get('/:spotId', //(req, res, next) => {req.temp = 'WOW'; next();},
         lastName:req.user.lastName
     };
 
-    return res.json(spots);
+    return res.json(spots[0]);
   }
 );
 
@@ -316,8 +320,9 @@ router.get('/:spotId/reviews',
         })
         delete review.dataValues.User.dataValues.username;
     });
+    const Reviews = reviews;
     return res.json({
-        reviews
+        Reviews
     });
   }
 );
@@ -380,9 +385,9 @@ router.get('/:spotId/bookings', requireAuth,
         }
     });
 
-
+    const Bookings = bookings;
     return res.json({
-        bookings
+        Bookings
     });
    }
 );

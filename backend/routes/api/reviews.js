@@ -55,8 +55,9 @@ router.get('/current', requireAuth,
         review.dataValues.Spot.dataValues.preview = ''
     }
 
+    const Reviews = reviews;
     return res.json({
-        reviews
+        Reviews
     });
   }
 );
@@ -175,9 +176,7 @@ router.put('/:reviewId', requireAuth, validateReviewEdit,
     if (stars) review_.stars = stars;
     await review_.save();
 
-    return res.json({
-      review_
-    });
+    return res.json(review_);
   }
 
 );
