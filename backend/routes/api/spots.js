@@ -51,56 +51,56 @@ const calcPreviewAndAvgReview = (spots, option) => {
 const validateQparams = [
   //const {, , , , , name, description, price} = req.body
   check('page')
-    .optional()
+    .optional({checkFalsy: true})
     .isNumeric()
     .custom(p => {
       return (p >= 1 && p <= 10)
     })
     .withMessage('Page must be greater than or equal to 1'),
   check('size')
-    .optional()
+    .optional({checkFalsy: true})
     .isNumeric()
     .custom(p => {
         return (p >= 1 && p <= 20)
     })
     .withMessage('Size must be greater than or equal to 1'),
   check('minLat')
-    .optional()
+    .optional({checkFalsy: true})
     .isNumeric()
     .custom(lat => {
       return (lat >= -90 && lat <= 90)
     })
   .withMessage('Minimum latitude is invalid'),
     check('maxLat')
-    .optional()
+    .optional({checkFalsy: true})
     .isNumeric()
     .custom(lat => {
       return (lat >= -90 && lat <= 90)
     })
     .withMessage('Maximum latitude is invalid'),
   check('minLng')
-    .optional()
+    .optional({checkFalsy: true})
     .isNumeric()
     .custom(lat => {
       return (lat >= -180 && lat <= 180)
     })
     .withMessage('Minimum longitude is invalid'),
   check('maxLng')
-  .optional()
+  .optional({checkFalsy: true})
   .isNumeric()
       .custom(lat => {
         return (lat >= -180 && lat <= 180)
       })
   .withMessage('Maximum longitude is invalid'),
   check('minPrice')
-  .optional()
+  .optional({checkFalsy: true})
   .isNumeric()
       .custom(lng => {
       return (lng >= 0)
   })
   .withMessage("Minimum price must be greater than or equal to 0"),
   check('maxPrice')
-  .optional()
+  .optional({checkFalsy: true})
   .isNumeric()
       .custom(lng => {
       return (lng >= 0)
