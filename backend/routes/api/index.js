@@ -25,9 +25,10 @@ router.use('/reviews', reviewRouter);
 router.use('/review-images', reviewImagesRouter);
 router.use('/spot-images', spotImagesRouter);
 
-router.post('/test', (req, res) => {
-  res.json({ requestBody: req.body });
-});
+//Was used before frontend was added.
+// router.post('/test', (req, res) => {
+//   res.json({ requestBody: req.body });
+// });
 
 module.exports = router;
 
