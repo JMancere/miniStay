@@ -2,3 +2,9 @@
 .error{
   color: red;
 }
+
+.redBox{
+  border-color: orangered;
+  border-width: 1px;
+  border-style:dashed;
+}
