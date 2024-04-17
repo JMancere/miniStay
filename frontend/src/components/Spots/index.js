@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react';
 import { getAllSpotsThunk } from '../../store/spots';
-import  SpotDetail  from '../SpotDetail'
+import SpotItem from '../SpotItem';
 
 function Spots() {
   const dispatch = useDispatch();
@@ -15,12 +15,22 @@ function Spots() {
 
   console.log('spots===', spots);
 
+  // function getSL(){
+  //   let res;
+  //   if (spots.spots){
+
+  //     res = spots.spots.map((spot) => {
+  //         return <SpotDetail key={spot.id} spot={spot} />
+  //     });
+  //   }
+  //   return res ;
+  // }
   function getSL(){
     let res;
     if (spots.spots){
 
       res = spots.spots.map((spot) => {
-          return <SpotDetail key={spot.id} spot={spot} />
+          return <SpotItem key={spot.id} spot={spot} />
       });
     }
     return res ;
