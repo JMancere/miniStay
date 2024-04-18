@@ -1,0 +1,18 @@
+.spotItem{
+  padding: 5px;
+}
+
+.citystate{
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "left right";
+}
+
+.stars{
+  color: blue;
+}
+
+.price {
+  font-weight: bold;
+}

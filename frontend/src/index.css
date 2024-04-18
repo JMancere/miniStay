@@ -8,3 +8,8 @@
   border-width: 1px;
   border-style:dashed;
 }
+.redBox2{
+  border-color: orangered;
+  border-width: 2px;
+  border-style:solid;
+}

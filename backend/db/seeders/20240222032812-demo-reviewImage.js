@@ -10,15 +10,23 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await ReviewImage.bulkCreate([
       {
-        url: 'http://demo.io/Fake1',
+        url: 'https://mp-cache-assets-production.izea.com/ai/p6mbarvope6o2a28fixx0c44nwql_watermark.png',
         reviewId: 1
       },
       {
-        url: 'http://demo.io/Fake2',
+        url: 'https://mp-cache-assets-production.izea.com/ai/ek7flfg5sm51lwfi3knx42tva1ht_watermark.png',
         reviewId: 2
       },
       {
-        url: 'http://demo.io/Fake3',
+        url: 'https://mp-cache-assets-production.izea.com/ai/g394hugywp3fa6bhtejw8keuhy27_watermark.png',
+        reviewId: 3
+      },
+      {
+        url: 'https://mp-cache-assets-production.izea.com/ai/p9nbv2bf0gmcvl97odbdi6iryyyo_watermark.png',
+        reviewId: 3
+      },
+      {
+        url: 'https://mp-cache-assets-production.izea.com/ai/be1qso49ej2wv9tbpsfrkxzq3vf4_watermark.png',
         reviewId: 3
       },
     ], { validate: true });

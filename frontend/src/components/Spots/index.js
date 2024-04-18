@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react';
 import { getAllSpotsThunk } from '../../store/spots';
 import SpotItem from '../SpotItem';
+import './Spots.css';
 
 function Spots() {
   const dispatch = useDispatch();
@@ -30,15 +31,15 @@ function Spots() {
     if (spots.spots){
 
       res = spots.spots.map((spot) => {
-          return <SpotItem key={spot.id} spot={spot} />
+          return <SpotItem key={spot.id} spot={spot}/>
       });
     }
     return res ;
   }
   return (
-    <div className="spots redBox">
+    <div className="redBox">
       <h1>Spot List</h1>
-      <ul className="redBox spotList">
+      <ul className="redBox spots">
         {getSL()}
       </ul>
     </div>
