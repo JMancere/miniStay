@@ -15,31 +15,51 @@ function SpotDetail() {
   const spot = useSelector((store) => store.spots.spots?.find((e) => e.id === Number(id)));
 
   useEffect(() => {
+    no no no... need to call api spots/ID to get detail specific stuffs.
     dispatch(getAllSpotsThunk());
   }, [dispatch]);
 
   if (!spot)
     return <></>
 
-  return (
-    <li className="spot-details redBox">
-      <p className="redBox" >id: {spot.id}</p>
-      <p>name: {spot.name}</p>
-      <p>descrition: {spot.description}</p>
-      <p>address: {spot.address}</p>
-      <p>city: {spot.city}</p>
-      <p>state: {spot.state}</p>
-      <p>country: {spot.country}</p>
-      <p>lat: {spot.lat}</p>
-      <p>lng: {spot.lng}</p>
-      <p>price: {spot.price}</p>
-      <p>ownerId: {spot.ownerId}</p>
-      <p>previewImage: {spot.previewImage}</p>
-      <p>avgRating: {spot.avgRating}</p>
-      <p>CA: {spot.createdAt}</p>
-      <p>UP: {spot.updatedAt}</p>
-    </li>
-  );
+    return (
+      <div className="spot-details redBox">
+        <h1>{spot.name}</h1>
+        <p>{spot.city}, {spot.state}, {spot.country}</p>
+        <img src={spot.previewImage} alt={spot.previewImage} height='400px' width="400px"></img>
+        <p className="redBox" >id: {spot.id}</p>
+        <p>descrition: {spot.description}</p>
+        <p>address: {spot.address}</p>
+        <p>lat: {spot.lat}</p>
+        <p>lng: {spot.lng}</p>
+        <p>price: {spot.price}</p>
+        <p>ownerId: {spot.ownerId}</p>
+        <p>previewImage: {spot.previewImage}</p>
+        <p>avgRating: {spot.avgRating}</p>
+        <p>CA: {spot.createdAt}</p>
+        <p>UP: {spot.updatedAt}</p>
+      </div>
+    );
+
+    // return (
+  //   <li className="spot-details redBox">
+  //     <p className="redBox" >id: {spot.id}</p>
+  //     <p>name: {spot.name}</p>
+  //     <p>descrition: {spot.description}</p>
+  //     <p>address: {spot.address}</p>
+  //     <p>city: {spot.city}</p>
+  //     <p>state: {spot.state}</p>
+  //     <p>country: {spot.country}</p>
+  //     <p>lat: {spot.lat}</p>
+  //     <p>lng: {spot.lng}</p>
+  //     <p>price: {spot.price}</p>
+  //     <p>ownerId: {spot.ownerId}</p>
+  //     <p>previewImage: {spot.previewImage}</p>
+  //     <p>avgRating: {spot.avgRating}</p>
+  //     <p>CA: {spot.createdAt}</p>
+  //     <p>UP: {spot.updatedAt}</p>
+  //   </li>
+  // );
 }
 
 export default SpotDetail;
