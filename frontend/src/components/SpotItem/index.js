@@ -7,7 +7,7 @@ function SpotItem({ spot }) {
 //<image src= {spot.previewImage} alt={spot.previewImage}></image>
 //<img src="https://www.pinclipart.com/picdir/big/519-5193057_hut-clipart-wooden-house-wooden-house-clipart-png.png" height="30px" alt="preview"></img>
 return (
-    <><NavLink to={`spots/${spot.id}`}>
+    <><NavLink to={`${spot.id}`} exact="true">
       <div className='spotItem redBox2'>
         <img src={spot.previewImage} alt={spot.previewImage} height='400px' width="400px"></img>
         <div className='citystate redBox'>

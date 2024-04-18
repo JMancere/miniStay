@@ -4,9 +4,13 @@ import "./index.css";
 
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom';
+//import { BrowserRouter, createBrowserRouter, RouterProvider, Navigate, Outlet } from "react-router-dom";
 import { ModalProvider, Modal } from "./context/Modal";
 import App from "./App";
+import SpotDetail from './components/SpotDetail'
+
+import Spots from "./components/Spots";
 
 import configureStore from "./store";
 import { restoreCSRF, csrfFetch } from "./store/csrf";
@@ -21,6 +25,38 @@ if (process.env.NODE_ENV !== "production") {
   window.sessionActions = sessionActions;
 }
 
+function AppLayout() {
+  return (
+    <>
+      <App />
+      <Outlet />
+      <Modal />
+    </>
+  )
+}
+
+const router = createBrowserRouter([
+  {
+    path: 'spots',
+    element: (<> <AppLayout />  </>)
+    ,
+    children: [
+      {
+        path: '',
+        element: <Spots />
+      },
+      {
+        path: ':id',
+        element: <SpotDetail />
+      }
+    ]
+  },
+  {
+    path: '*',
+    element: <Navigate to='/spots' replace={true} />
+  }
+]);
+
 // Wrap the application with the Modal provider and render the Modal component
 // after the App component so that all the Modal content will be layered as
 // HTML elements on top of the all the other HTML elements:
@@ -28,10 +64,11 @@ function Root() {
   return (
     <ModalProvider>
       <Provider store={store}>
-        <BrowserRouter>
+      <RouterProvider router={router} />
+        {/* <BrowserRouter>
           <App />
           <Modal />
-        </BrowserRouter>
+        </BrowserRouter> */}
       </Provider>
     </ModalProvider>
   );

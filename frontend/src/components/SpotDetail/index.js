@@ -1,8 +1,25 @@
 import './SpotDetail.css'
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {useParams} from 'react-router-dom';
+import { getAllSpotsThunk } from '../../store/spots';
+import { useEffect } from 'react';
 
-function SpotDetail({ spot }) {
+function SpotDetail() {
+  //need to get spot from store.
+
   const dispatch = useDispatch();
+
+  const { id } = useParams();
+
+  //If we are loading this spot page directly, bypassing spots, the store will not be initialized.
+  const spot = useSelector((store) => store.spots.spots?.find((e) => e.id === Number(id)));
+
+  useEffect(() => {
+    dispatch(getAllSpotsThunk());
+  }, [dispatch]);
+
+  if (!spot)
+    return <></>
 
   return (
     <li className="spot-details redBox">
