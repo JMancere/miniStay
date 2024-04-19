@@ -241,7 +241,7 @@ router.get('/:spotId', //(req, res, next) => {req.temp = 'WOW'; next();},
     let spots = await Spot.findAll(
         {
             where: {id: spotId},
-            include: ['Reviews', 'SpotImages']
+            include: ['Reviews', 'SpotImages', 'User']
         }
     );
 
@@ -260,12 +260,19 @@ router.get('/:spotId', //(req, res, next) => {req.temp = 'WOW'; next();},
             delete s.dataValues.spotId
         })
         delete spot.dataValues.Reviews
+
+        spot.dataValues.Owner = spot.dataValues.User;
+        delete spot.dataValues.User;
     });
-    spots[0].dataValues.Owner = {
-        id:req.user.id,
-        firstName:req.user.firstName,
-        lastName:req.user.lastName
-    };
+    // if (req.user){
+    //   spots[0].dataValues.Owner = {
+    //       id:req.user.id,
+    //       firstName:req.user.firstName,
+    //       lastName:req.user.lastName
+    //   };
+    // } else {
+    //   spots[0].dataValues.Owner = {}
+    // };
 
     return res.json(spots[0]);
   }

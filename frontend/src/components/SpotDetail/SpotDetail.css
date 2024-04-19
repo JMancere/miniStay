@@ -1,0 +1,36 @@
+.topDetailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1 fr;
+  grid-template-areas:
+    "im im ima imb"
+    "im im imc imd";
+}
+
+.imgSub {
+  height: 234px;
+  width: 234px;
+}
+
+.prevImg {
+  height: 475px;
+  width: 475px;
+  grid-area: im;
+  padding: 3px;
+}
+.Img1 {
+  grid-area: ima;
+  padding: 3px;
+}
+.Img2 {
+  grid-area: imb;
+  padding: 3px;
+}
+.Img3 {
+  grid-area: imc;
+  padding: 3px;
+}
+.Img4 {
+  grid-area: imd;
+  padding: 3px;
+}

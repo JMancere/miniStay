@@ -17,7 +17,7 @@ function Navigation({ isLoaded }){
       </NavLink>
       <ul className="redBox menu" >
         <li className="redBox menu" >
-            <NavLink exact to="/">Home</NavLink>
+            <NavLink to="/">Home</NavLink>
         </li>
         {isLoaded && (
             <ProfileButton  className="profilelogo one"user={sessionUser} />
