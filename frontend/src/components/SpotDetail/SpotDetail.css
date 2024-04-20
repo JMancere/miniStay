@@ -73,7 +73,7 @@
 }
 
 .DetailBottom{
-  display: flex;
+  display: grid;
 }
 .reviewItem{
   border-color: blue;
