@@ -10,10 +10,10 @@ const getAllSpots = (spots) => {
   };
 };
 
-const getSpotDetails = (spot) => {
+const getSpotDetails = (spot, reviews) => {
   return {
     type: GET_SPOTDETAILS,
-    payload: spot,
+    payload: {spot, reviews},
   };
 };
 
@@ -32,13 +32,23 @@ export const getAllSpotsThunk = () => async (dispatch) => {
 
 export const getSpotDetailsThunk = (id) => async (dispatch) => {
   const response = await csrfFetch(`/api/spots/${id}`);
-  console.log('resp', response)
+  //console.log('resp', response)
 
   if (response.ok){
     const data = await response.json();
     //console.log('data', data)
-    dispatch(getSpotDetails(data));
+    //dispatch(getSpotDetails(data));
+
+    //now that we have pot data, get reviews for that spot.
+    const responseReviews = await csrfFetch(`/api/spots/${id}/reviews`);
+    if (responseReviews.ok){
+      const dataReviews = await responseReviews.json();
+      dispatch(getSpotDetails(data, dataReviews));
+    } else {
+      return responseReviews;
+    }
   } else {
+    return response;
   }
   return response;
 };
@@ -53,7 +63,7 @@ const spotsReducer = (state = initialState, action) => {
       newState = Object.assign({}, state);
       if (!newState.details)
       newState.details = {};
-      newState.details[action.payload.id] = action.payload;
+      newState.details[action.payload.spot.id] = action.payload;
       return newState;
     case GET_SPOTS:
       newState = Object.assign({}, state);

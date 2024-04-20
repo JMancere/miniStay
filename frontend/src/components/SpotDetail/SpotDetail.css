@@ -1,7 +1,7 @@
 .topDetailGrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1 fr;
+  grid-template-rows: 1fr 1fr;
   grid-template-areas:
     "im im ima imb"
     "im im imc imd";
@@ -33,4 +33,58 @@
 .Img4 {
   grid-area: imd;
   padding: 3px;
+}
+
+.DetailTOP {
+  border-bottom: solid black 1px;
+}
+
+.reserveBox{
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "left .   right"
+    "btn btn btn";
+
+  margin: 10px;
+}
+
+.DetailMid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1 fr;
+  grid-template-areas:
+    "host host host review review"
+    "desc desc desc review review";
+}
+
+.host{
+  grid-area: host;
+}
+.desc{
+  grid-area: desc;
+}
+.midRating{
+  grid-area: review;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.DetailBottom{
+  display: flex;
+}
+.reviewItem{
+  border-color: blue;
+  border-style: solid;
+}
+
+.midBtn{
+  grid-area: btn;
+
+  background-color: red;
+  color: white;
+  height: 150%;
+
 }

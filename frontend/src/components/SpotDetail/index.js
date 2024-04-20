@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {useParams} from 'react-router-dom';
 import { getSpotDetailsThunk } from '../../store/spots';
 import { useEffect } from 'react';
+import ReviewItem from '../ReviewItem';
 
 function SpotDetail() {
   //need to get spot from store.
@@ -11,21 +12,28 @@ function SpotDetail() {
 
   const { id } = useParams();
 
-  //If we are loading this spot page directly, bypassing spots, the store will not be initialized.
-  //const spot = useSelector((store) => store.spots.spots?.find((e) => e.id === Number(id)));
   const spot = useSelector((store) => {
-    if (store.spots.details)
-      return store.spots.details[id];
+    if (store.spots.details && store.spots.details[id])
+      return store.spots.details[id].spot;
 
      return null
   });
+
+  let reviews = useSelector((store) => {
+    if (store.spots.details && store.spots.details[id])
+      return store.spots.details[id].reviews.Reviews;
+
+     return null
+  });
+  if (!reviews) reviews = []
 
   useEffect(() => {
      dispatch(getSpotDetailsThunk(id));
   }, [dispatch, id]);
 
 
-console.log('EL SPOT:::', spot)
+  console.log('EL SPOT:::', spot)
+  console.log('EL REVIEWS:::', reviews)
 
   function getImages(){
     //return preview first then the rest
@@ -44,7 +52,6 @@ console.log('EL SPOT:::', spot)
         }
       }
     }
-
     return imgs
   }
 
@@ -58,8 +65,31 @@ console.log('EL SPOT:::', spot)
   let img3 = imgs[3];
   let img4 = imgs[4];
 
+  function getRL(){
+      let res;
+      if (reviews){
+
+        res = reviews.map((review) => {
+            return <ReviewItem className='reviewItem' key={review.id} review={review}/>
+        });
+      }
+      return res ;
+    }
+
+  function getStarLengthStr(length){
+    if (length === 1)
+      return length + ' review';
+    else if (length > 1)
+      return length + ' reviews';
+    else
+    return 'NEW';
+  }
+  function reserveClick(e){
+    window.alert('Feature Coming Soon...')
+  }
   return (
-    <div className="redBox">
+    <>
+    <div className="DetailTOP redBox">
       <h1>{spot.name}</h1>
       <p>{spot.city}, {spot.state}, {spot.country}</p>
       <div className="topDetailGrid redBox">
@@ -68,43 +98,27 @@ console.log('EL SPOT:::', spot)
         {{img2} && <img className='Img2 imgSub' src={img2} alt={img2} ></img>}
         {{img3} && <img className='Img3 imgSub' src={img3} alt={img3} ></img>}
         {{img4} && <img className='Img4 imgSub' src={img4} alt={img4} ></img>}
+      </div>
+    </div>
+    <div className="DetailMid redBox">
+      <h2 className='host'>Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</h2>
+      <p className='desc'>{spot.description}</p>
+      <div className='midRating'>
+        <div className='reserveBox'>
+          <p><span style={{"fontWeight": "bold"}}>${spot.price}</span> night</p>
+          <p>★ {spot.avgStarRating} • {getStarLengthStr(reviews.length)}</p>
+          <button onClick={reserveClick} className='midBtn'>Reserve</button>
+        </div>
 
       </div>
-
-
-      <p className="redBox" >id: {spot.id}</p>
-      <p>descrition: {spot.description}</p>
-      <p>address: {spot.address}</p>
-      <p>lat: {spot.lat}</p>
-      <p>lng: {spot.lng}</p>
-      <p>price: {spot.price}</p>
-      <p>ownerId: {spot.ownerId}</p>
-      <p>previewImage: {spot.previewImage}</p>
-      <p>avgRating: {spot.avgRating}</p>
-      <p>CA: {spot.createdAt}</p>
-      <p>UP: {spot.updatedAt}</p>
     </div>
-  );
 
-    // return (
-  //   <li className="spot-details redBox">
-  //     <p className="redBox" >id: {spot.id}</p>
-  //     <p>name: {spot.name}</p>
-  //     <p>descrition: {spot.description}</p>
-  //     <p>address: {spot.address}</p>
-  //     <p>city: {spot.city}</p>
-  //     <p>state: {spot.state}</p>
-  //     <p>country: {spot.country}</p>
-  //     <p>lat: {spot.lat}</p>
-  //     <p>lng: {spot.lng}</p>
-  //     <p>price: {spot.price}</p>
-  //     <p>ownerId: {spot.ownerId}</p>
-  //     <p>previewImage: {spot.previewImage}</p>
-  //     <p>avgRating: {spot.avgRating}</p>
-  //     <p>CA: {spot.createdAt}</p>
-  //     <p>UP: {spot.updatedAt}</p>
-  //   </li>
-  // );
+    <h2>★ {spot.avgStarRating} • {getStarLengthStr(reviews.length)}</h2>
+    <div className="DetailBottom redBox">
+      {getRL()}
+    </div>
+    </>
+  );
 }
 
 export default SpotDetail;

@@ -16,16 +16,6 @@ function Spots() {
 
   console.log('spots===', spots);
 
-  // function getSL(){
-  //   let res;
-  //   if (spots.spots){
-
-  //     res = spots.spots.map((spot) => {
-  //         return <SpotDetail key={spot.id} spot={spot} />
-  //     });
-  //   }
-  //   return res ;
-  // }
   function getSL(){
     let res;
     if (spots.spots){
