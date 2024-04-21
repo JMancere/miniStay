@@ -46,12 +46,12 @@ export function Modal() {
 
   // Render the following component to the div referenced by the modalRef
   return ReactDOM.createPortal(
-    <div id="modal">
+    <div id="modal" >
       <div id="modal-background" onClick={closeModal} />
-      <div id="modal-content">{modalContent}</div>
+      <div id="modal-content" className="login">{modalContent}</div>
     </div>,
     modalRef.current
   );
 }
-
+//className="login"
 export const useModal = () => useContext(ModalContext);
