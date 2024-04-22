@@ -2,6 +2,7 @@ import { csrfFetch } from "./csrf";
 
 const GET_SPOTS = "spots/getAll";
 const GET_SPOTDETAILS = "spots/getSpotDetails";
+const ADD_SPOT = 'spots/addSpot';
 
 const getAllSpots = (spots) => {
   return {
@@ -16,6 +17,33 @@ const getSpotDetails = (spot, reviews) => {
     payload: {spot, reviews},
   };
 };
+
+const addSpot = (spot) => {
+  return {
+    type: ADD_SPOT,
+    payload: {spot},
+  };
+}
+export const createSpotThunk = (spot) => async (dispatch) => {
+  let response;
+  response = await csrfFetch("/api/spots/",
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(spot)
+    }
+  );
+
+  if (response.ok){
+    const data = await response.json();
+      //console.log('TO BE ADDED TO STORE::', data)
+      dispatch(addSpot(data));
+  } else {
+  }
+
+  return response;
+};
+
 
 export const getAllSpotsThunk = () => async (dispatch) => {
   const response = await csrfFetch("/api/spots");
@@ -59,6 +87,10 @@ const initialState = { spots: null };
 const spotsReducer = (state = initialState, action) => {
   let newState;
   switch (action.type) {
+    case ADD_SPOT:
+      newState = Object.assign({}, state);
+      newState.spots[action.payload.spot.id] = action.payload;
+      return newState;
     case GET_SPOTDETAILS:
       newState = Object.assign({}, state);
       if (!newState.details)
@@ -67,8 +99,10 @@ const spotsReducer = (state = initialState, action) => {
       return newState;
     case GET_SPOTS:
       newState = Object.assign({}, state);
-      //TODO normalize and convert to {} from []
-      newState.spots = action.payload;
+      newState.spots = {};
+      action.payload.forEach(element => {
+        newState.spots[element.id] = element
+      });
       return newState;
     default:
       return state;

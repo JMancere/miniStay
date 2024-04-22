@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector} from 'react-redux';
+import { useDispatch} from 'react-redux';
 import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from './OpenModalMenuItem';
 import LoginFormModal from '../LoginFormModal';
 import SignupFormModal from '../SignupFormModal';
 import './Navigation.css';
 import { NavLink } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function ProfileButton({ user }) {
+  const navigate = useNavigate();
+
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
   const ulRef = useRef();
@@ -55,15 +56,12 @@ function ProfileButton({ user }) {
       )
   }
 
-
   const logout = (e) => {
     e.preventDefault();
     dispatch(sessionActions.logout());
     closeMenu();
-    navigate("/ssssss");
+    navigate("/");
   };
-  const navigate = useNavigate();
-
 
   return (
     <>
