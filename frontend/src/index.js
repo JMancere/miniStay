@@ -9,7 +9,7 @@ import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-rou
 import { ModalProvider, Modal } from "./context/Modal";
 import App from "./App";
 import SpotDetail from './components/SpotDetail'
-
+import SpotNew from "./components/SpotNew";
 import Spots from "./components/Spots";
 
 import configureStore from "./store";
@@ -48,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: ':id',
         element: <SpotDetail />
+      },
+      {
+        path: 'new',
+        element: <SpotNew />
       }
     ]
   },

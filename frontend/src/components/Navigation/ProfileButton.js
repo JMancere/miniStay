@@ -1,26 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector} from 'react-redux';
 import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from './OpenModalMenuItem';
 import LoginFormModal from '../LoginFormModal';
 import SignupFormModal from '../SignupFormModal';
 import './Navigation.css';
+import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ProfileButton({ user }) {
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
   const ulRef = useRef();
 
-  const openMenu = () => {
-    if (showMenu) return;
-    setShowMenu(true);
-  };
+  // const user = useSelector(state => state.session.user);
 
+
+  // const openMenu = () => {
+  //   if (showMenu) return;
+  //   setShowMenu(true);
+  // };
+
+  const toggleMenu = (e) => {
+    e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
+    setShowMenu(!showMenu);
+  };
   useEffect(() => {
     if (!showMenu) return;
 
     const closeMenu = (e) => {
-      if (!ulRef.current.contains(e.target)) {
+
+      if (ulRef.current && !ulRef.current.contains(e.target)) {
         setShowMenu(false);
       }
     };
@@ -32,29 +43,54 @@ function ProfileButton({ user }) {
 
   const closeMenu = () => setShowMenu(false);
 
+
+  const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
+  //<i class="fa-sharp fa-solid fa-m" color="#ea3434"></i>
+  // {/* <i className="fa-sharp fa-solid fa-m"></i> */}
+  function getLink(){
+      return ( user &&
+        <NavLink className='middle' to="/spots/new" >
+        Create a new spot
+        </NavLink>
+      )
+  }
+
+
   const logout = (e) => {
     e.preventDefault();
     dispatch(sessionActions.logout());
     closeMenu();
+    navigate("/ssssss");
   };
+  const navigate = useNavigate();
 
-  const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
-  //<i class="fa-sharp fa-solid fa-m" color="#ea3434"></i>
 
   return (
     <>
-      <button onClick={openMenu}>
-      <i className="fa-sharp fa-solid fa-m"></i>
-      </button>
+      <p>{getLink()}</p>
+      <div className="hamburger-container" onClick={toggleMenu}>
+      <div className="hamburger-wrapper">
+          {/* Hamburger Icon */}
+          <div className="hamburger-icon">
+            <i className="fa-solid fa-bars"></i>
+          </div>
+          {/* User Icon */}
+          <div className="user-logo">
+            <i className="fa-solid fa-circle-user"></i>
+          </div>
+        </div>
+      </div>
 
       <ul className={ulClassName} ref={ulRef}>
         {user ? (
           <>
-            <li>{user.username}</li>
-            <li>{user.firstName} {user.lastName}</li>
+            <li>Hello, {user.username}</li>
             <li>{user.email}</li>
+
+            <NavLink to="/spots/current" >Manage Spots</NavLink>
+
             <li>
-              <button onClick={logout}>Log Out</button>
+              <Link to="/" onClick={logout}>Log Out</Link>
             </li>
           </>
         ) : (
