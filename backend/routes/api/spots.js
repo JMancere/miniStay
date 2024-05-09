@@ -34,15 +34,15 @@ const calcPreviewAndAvgReview = (spots, option) => {
 
         if (option.avgRating){
             if (count > 0)
-                spot.dataValues.avgRating = sum/count
+                spot.dataValues.avgRating = (sum/count).toFixed(1)
             else
-                spot.dataValues.avgRating = 'none';
+                spot.dataValues.avgRating = 'New';//'none';
         }
         if (option.avgStarRating){
             if (count > 0)
-                spot.dataValues.avgStarRating = sum/count
+                spot.dataValues.avgStarRating = (sum/count).toFixed(1)
             else
-                spot.dataValues.avgStarRating = 'none';
+                spot.dataValues.avgStarRating = 'New';//'none';
         }
     })
 

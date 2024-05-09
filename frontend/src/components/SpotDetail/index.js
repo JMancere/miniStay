@@ -12,6 +12,8 @@ function SpotDetail() {
 
   const { id } = useParams();
 
+  const sessionUser = useSelector(state => state.session.user);
+
   const spot = useSelector((store) => {
     if (store.spots.details && store.spots.details[id])
       return store.spots.details[id].spot;
@@ -32,6 +34,7 @@ function SpotDetail() {
   }, [dispatch, id]);
 
 
+  console.log('EL SESSIONUSER:::', sessionUser)
   console.log('EL SPOT:::', spot)
   console.log('EL REVIEWS:::', reviews)
 
@@ -65,24 +68,35 @@ function SpotDetail() {
   let img3 = imgs[3];
   let img4 = imgs[4];
 
+  function currentUserOwnsSpot(){
+    return sessionUser ? sessionUser.id === spot.Owner.id : true;
+  }
+
   function getRL(){
+
       let res;
       if (reviews){
-
-        res = reviews.map((review) => {
+        if (reviews.length === 0){
+          if (!currentUserOwnsSpot()){
+            //if logged in does not own spot.
+            res = <p>Be the first to post a review!</p>
+          }
+        } else {
+          res = reviews.map((review) => {
             return <ReviewItem className='reviewItem' key={review.id} review={review}/>
-        });
+          });
+        }
       }
-      return res ;
+      return res;
     }
 
   function getStarLengthStr(length){
     if (length === 1)
-      return length + ' review';
+      return '• ' + length + ' Review';
     else if (length > 1)
-      return length + ' reviews';
+      return '• ' + length + ' Reviews';
     else
-    return 'NEW';
+    return '';
   }
   function reserveClick(e){
     window.alert('Feature Coming Soon...')
@@ -106,14 +120,14 @@ function SpotDetail() {
       <div className='midRating'>
         <div className='reserveBox'>
           <p><span style={{"fontWeight": "bold"}}>${spot.price}</span> night</p>
-          <p>★ {spot.avgStarRating} • {getStarLengthStr(reviews.length)}</p>
+          <p>★ {spot.avgStarRating} {getStarLengthStr(reviews.length)}</p>
           <button onClick={reserveClick} className='midBtn'>Reserve</button>
         </div>
 
       </div>
     </div>
 
-    <h2>★ {spot.avgStarRating} • {getStarLengthStr(reviews.length)}</h2>
+    <h2>★ {spot.avgStarRating} {getStarLengthStr(reviews.length)}</h2>
     <div className="DetailBottom redBox">
       {getRL()}
     </div>
