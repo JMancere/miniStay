@@ -1,6 +1,6 @@
 import './SpotNew.css';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createSpotThunk } from '../../store/spots';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
@@ -24,8 +24,16 @@ function SpotNew() {
   const [img3, setImg3] = useState('');
   const [img4, setImg4] = useState('');
   const [errors, setErrors] = useState("");
+  //const [doReset, setDoReset] = useState();
 
-  const handleSubmit = (e) => {
+//   useEffect(() => {
+//     if (doReset){
+//         navigate(`/spots/${doReset}`);
+//       };
+//  }, [navigate, doReset]);
+
+
+ const handleSubmit = (e) => {
     e.preventDefault();
 
     const spot = {}
@@ -39,45 +47,57 @@ function SpotNew() {
     spot.name = name;
     spot.price = price;
     spot.imgPreview = imgPreview;
-    spot.img1 = img1;
-    spot.img2 = img2;
-    spot.img2 = img3;
-    spot.img2 = img4;
 
+    if (img1) spot.img1 = img1;
+    if (img2) spot.img2 = img2;
+    if (img3) spot.img3 = img3;
+    if (img4) spot.img4 = img4;
 
     return dispatch(createSpotThunk(spot))
       .then(
-        reset()
+         (res) => {
+          reset(res)
+         }
+        //setDoReset(true)
       ).catch(async (res) => {
+        console.log('IN CATCH, ', res);
         const data = await res.json();
 
         console.log('EL errors::', data.errors)
         if (data && data.errors) {
-          setErrors(data.errors);
+          return setErrors(data.errors);
         }
       });
 
   };
 
-  const reset = () => {
-    if (errors)
+  const reset = (res) => {
+    console.log('in reset...')
+    console.log('errors ===', errors)
+    console.log('reset res ==== ', res)
+    //console.log('newError ===', newError)
+    if (errors) {
+      console.log('in reset... NOT CLOSING')
       return;
-    setCountry('');
-    setAddress('');
-    setCity('');
-    setState('');
-    setLat('');
-    setLng('');
-    setDescription('');
-    setName('');
-    setPrice('');
-    setImgPreview('');
-    setImg1('');
-    setImg2('');
-    setImg3('');
-    setImg4('');
+    } else {
+      console.log('in reset... !!!!!CLOSING!!!!!')
+      setCountry('');
+      setAddress('');
+      setCity('');
+      setState('');
+      setLat('');
+      setLng('');
+      setDescription('');
+      setName('');
+      setPrice('');
+      setImgPreview('');
+      setImg1('');
+      setImg2('');
+      setImg3('');
+      setImg4('');
 
-    navigate("/");
+      navigate(`/spots/${res.id}`);
+    }
   };
 
   return <>
@@ -144,7 +164,6 @@ function SpotNew() {
               value={lat}
               placeholder='Latitude'
               name='lat'
-              required
             />
             Longitude
             {errors.lng && (<p className="error">{errors.lng}</p>)}
@@ -154,7 +173,6 @@ function SpotNew() {
               value={lng}
               placeholder='Longitude'
               name='lng'
-              required
             />
 
           <hr></hr>
@@ -204,6 +222,7 @@ function SpotNew() {
               value={imgPreview}
               placeholder='Preview Image URL'
               name='imgPreview'
+              required
         />
         {errors.img1 && (<p className="error">{errors.img1}</p>)}
         <input

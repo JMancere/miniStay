@@ -25,6 +25,8 @@ const addSpot = (spot) => {
   };
 }
 export const createSpotThunk = (spot) => async (dispatch) => {
+  console.log('CREATING SPOT:::', spot);
+
   let response;
   response = await csrfFetch("/api/spots/",
     {
@@ -36,8 +38,41 @@ export const createSpotThunk = (spot) => async (dispatch) => {
 
   if (response.ok){
     const data = await response.json();
-      //console.log('TO BE ADDED TO STORE::', data)
-      dispatch(addSpot(data));
+    dispatch(addSpot(data));
+    console.log('adadaddadad', data)
+    //add any images
+    if (spot.imgPreview){
+      let img = {};
+      img.url = spot.imgPreview;
+      img.preview = true;
+      response = await csrfFetch(`/api/spots/${data.id}/images`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(img)
+      }
+      );
+
+      for(let i = 1; i <=4; i++){
+        if (spot['img'+i]){
+          let img = {};
+          img.url = spot['img'+i];
+          img.preview = false;
+          console.log('attempting create ', 'img'+i, 'img'+i)
+          response = await csrfFetch(`/api/spots/${data.id}/images`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(img)
+          }
+          );
+        }
+      }
+      //reload all spots.
+      getAllSpotsThunk()
+      return(data)
+    }
+
   } else {
   }
 
@@ -51,7 +86,7 @@ export const getAllSpotsThunk = () => async (dispatch) => {
 
   if (response.ok){
     const data = await response.json();
-    //console.log('data', data)
+    console.log('SPOTS THUNK data', data)
     dispatch(getAllSpots(data.Spots));
   } else {
   }
@@ -89,6 +124,7 @@ const spotsReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_SPOT:
       newState = Object.assign({}, state);
+      if (!newState.spots) newState.spots = {}
       newState.spots[action.payload.spot.id] = action.payload;
       return newState;
     case GET_SPOTDETAILS:

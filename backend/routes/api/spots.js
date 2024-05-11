@@ -423,15 +423,17 @@ const validateCreate = [
         .exists({ checkFalsy: true })
         .withMessage('Country is required'),
     body('lat')
+        .optional({ checkFalsy: true })
         .isNumeric()
         .custom(lat => {
             return (lat >= -90 && lat <= 90)
     })
     .withMessage('Latitude must be within -90 and 90'),
     body('lng')
+        .optional({ checkFalsy: true })
         .isNumeric()
         .custom(lng => {
-        return (lng >= -180 && lng <= 180)
+        return ((lng >= -180 && lng <= 180))
     })
     .withMessage('Longitude must be within -180 and 180'),
     body('name')
