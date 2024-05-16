@@ -88,3 +88,11 @@
   height: 150%;
 
 }
+
+.postReview{
+  width: 200px;
+  font-weight: bold;
+  font-size: 15px;
+  color: purple;
+  background-color: wheat;
+}
