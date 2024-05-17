@@ -11,6 +11,7 @@ import App from "./App";
 import SpotDetail from './components/SpotDetail'
 import SpotNew from "./components/SpotNew";
 import Spots from "./components/Spots";
+import SpotManage from "./components/SpotManage";
 
 import configureStore from "./store";
 import { restoreCSRF, csrfFetch } from "./store/csrf";
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
       {
         path: 'new',
         element: <SpotNew />
+      },
+      {
+        path: 'current',
+        element: <SpotManage />
       }
     ]
   },

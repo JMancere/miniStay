@@ -3,7 +3,9 @@ import { csrfFetch } from "./csrf";
 const GET_SPOTS = "spots/getAll";
 const GET_SPOTDETAILS = "spots/getSpotDetails";
 const ADD_SPOT = 'spots/addSpot';
-const ADD_REVIEW = 'soits/addReview';
+const ADD_REVIEW = 'spots/addReview';
+const GET_SPOTSCURRENT = 'spots/getSpotsCurrent';
+
 
 const addReview = (spotId, review) => {
   return {
@@ -33,6 +35,27 @@ const addSpot = (spot) => {
     type: ADD_SPOT,
     payload: {spot},
   };
+}
+
+const getSpotsCurrent = (spots) => {
+  return {
+    type: GET_SPOTSCURRENT,
+    payload: spots,
+  };
+}
+
+export const getCurrentSpotsThunk = () => async (dispatch) => {
+  const response = await csrfFetch("/api/spots/current");
+  //console.log('resp', response)
+
+  if (response.ok){
+    const data = await response.json();
+    //console.log('SPOTS THUNK data', data)
+    dispatch(getSpotsCurrent(data.Spots));
+  } else {
+  }
+  return response;
+
 }
 
 export const createReviewThunk = (spot, review) => async (dispatch) => {
@@ -185,6 +208,7 @@ const spotsReducer = (state = initialState, action) => {
       }
     return newState;
     case GET_SPOTS:
+    case GET_SPOTSCURRENT:
       if (!newState.spots) newState.spots = {};
       action.payload.forEach(element => {
         newState.spots[element.id] = element
