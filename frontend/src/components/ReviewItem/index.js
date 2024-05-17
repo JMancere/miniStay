@@ -1,7 +1,10 @@
 import './ReviewItem.css'
+import { useSelector } from 'react-redux';
 
-function ReviewItem({ review }) {
+function ReviewItem({review }) {
   console.log('EL review', review)
+
+  const sessionUser = useSelector(state => state.session.user);
 
   function getDate(){
     const months = ['January', 'February', 'March',
@@ -13,14 +16,27 @@ function ReviewItem({ review }) {
     return `${months[date.getMonth()]} ${date.getFullYear()}`;
 
   }
+  const hasDelete = () =>{
+    if (!sessionUser?.id || !review.User?.id) return;
+
+    return (<button>Delete</button>)
+  }
+
+  const doDeleteClick = () =>{
+
+
+  }
 
   return (
       <>
-      <div className='redBox item'>
+      <div onClick={doDeleteClick} className='redBox item'>
 
-        <p>{review.User.firstName}</p>
+        <p>{review.User?.firstName}</p>
         <p>{getDate()}</p>
         <p>{review.review}</p>
+
+        {hasDelete()}
+
       </div>
       </>
     );

@@ -36,6 +36,9 @@ function SpotNew() {
  const handleSubmit = (e) => {
     e.preventDefault();
 
+    //need to reset errors on submit cause they need to be retried.
+    setErrors('');
+
     const spot = {}
     spot.country = country;
     spot.address = address;
@@ -65,7 +68,7 @@ function SpotNew() {
 
         console.log('EL errors::', data.errors)
         if (data && data.errors) {
-          return setErrors(data.errors);
+          return spot.Owner;
         }
       });
 

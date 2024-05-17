@@ -17,23 +17,24 @@ function SpotDetail() {
   const sessionUser = useSelector(state => state.session.user);
 
   const spot = useSelector((store) => {
-    if (store.spots.details && store.spots.details[id])
-      return store.spots.details[id].spot;
+    console.log('store=====', store);
+    if (store.spots.spots && store.spots.spots[id])
+      return store.spots.spots[id];
 
      return null
   });
 
   let reviews = useSelector((store) => {
-    if (store.spots.details && store.spots.details[id])
-      return store.spots.details[id].reviews.Reviews;
+    if (store.spots.spots && store.spots.spots[id])
+      return store.spots.spots[id].Reviews;
 
      return null
   });
-  if (!reviews) reviews = []
+  if (!reviews) reviews = {}
 
   useEffect(() => {
      dispatch(getSpotDetailsThunk(id));
-  }, [dispatch, id, reviews?.length]);
+  }, [dispatch, id]);
 
 
   console.log('EL SESSIONUSER:::', sessionUser)
@@ -71,14 +72,14 @@ function SpotDetail() {
   let img4 = imgs[4];
 
   function currentUserOwnsSpot(){
-    return sessionUser ? sessionUser.id === spot.Owner.id : true;
+    return sessionUser ? sessionUser.id === spot.Owner?.id : true;
   }
 
   function getRL(){
 
       let res;
       if (reviews){
-        if (reviews.length === 0){
+        if (Object.keys(reviews).length === 0){
           if (!currentUserOwnsSpot()){
             //if logged in does not own spot.
             res = (<>
@@ -91,7 +92,12 @@ function SpotDetail() {
             )
           }
         } else {
-          res = reviews.map((review) => {
+
+          let lcl = []
+          for (let r in reviews){
+            lcl.push(reviews[r]);
+          }
+          res = lcl.map((review) => {
             return <ReviewItem className='reviewItem' key={review.id} review={review}/>
           });
         }
@@ -110,6 +116,10 @@ function SpotDetail() {
   function reserveClick(e){
     window.alert('Feature Coming Soon...')
   }
+
+  if (!spot.Owner)
+    return
+
   return (
     <>
     <div className="DetailTOP redBox">
@@ -124,7 +134,7 @@ function SpotDetail() {
       </div>
     </div>
     <div className="DetailMid redBox">
-      <h2 className='host'>Hosted by {spot.Owner.firstName} {spot.Owner.lastName}</h2>
+      <h2 className='host'>Hosted by {spot.Owner?.firstName} {spot.Owner?.lastName}</h2>
       <p className='desc'>{spot.description}</p>
       <div className='midRating'>
         <div className='reserveBox'>

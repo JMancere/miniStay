@@ -23,7 +23,8 @@ const getAllSpots = (spots) => {
 const getSpotDetails = (spot, reviews) => {
   return {
     type: GET_SPOTDETAILS,
-    payload: {spot, reviews},
+    payload: spot,
+    reviews: {reviews}
   };
 };
 
@@ -47,11 +48,8 @@ export const createReviewThunk = (spot, review) => async (dispatch) => {
   );
 
   if (response.ok){
-    //const data = await response.json();
-
-    getSpotDetailsThunk(spot.id)
-
-    //dispatch(addReview(spot.id, data));
+    const data = await response.json();
+    dispatch(addReview(spot.id, data));
   } else {
   }
 
@@ -133,7 +131,7 @@ export const getSpotDetailsThunk = (id) => async (dispatch) => {
 
   if (response.ok){
     const data = await response.json();
-    //console.log('data', data)
+    console.log('data for spotdets::', data)
     //dispatch(getSpotDetails(data));
 
     //now that we have pot data, get reviews for that spot.
@@ -157,21 +155,35 @@ const spotsReducer = (state = initialState, action) => {
   let newState = structuredClone(state);
   switch (action.type) {
     case ADD_REVIEW:
-      if (!newState.details[action.payload.spotId].reviews) {
-        newState.details[action.payload.spotId].reviews = []
-      }
-      newState.details[action.payload.spotId].reviews.push(action.payload)
+      if (!newState.spots) newState.spots = {};
+      if (!newState.spots[action.spotId]) newState.spots[action.spotId] = {};
+      if (!newState.spots[action.spotId].Reviews) newState.spots[action.spotId].Reviews = {};
+
+      newState.spots[action.spotId].Reviews[action.payload.id] = action.payload;
+      newState.spots[action.spotId].Reviews2 = action.payload;
+
       return newState;
     case ADD_SPOT:
       if (!newState.spots) newState.spots = {}
       newState.spots[action.payload.spot.id] = action.payload;
       return newState;
     case GET_SPOTDETAILS:
+      if (!newState.spots) newState.spots = {};
+      newState.spots[action.payload.id] = action.payload;
+      //console.log('act revs ===', action.reviews)
 
-      if (!newState.details) newState.details = {};
-      newState.details[action.payload.spot.id] = action.payload;
+      //newState.spots[action.payload.id].Reviews = action.reviews.reviews.Reviews;
+      //normalize reviews.
+      if (!newState.spots[action.payload.id].Reviews)
+        newState.spots[action.payload.id].Reviews = {};
+      //newState.spots[action.payload.id].Reviews2 = action.reviews.reviews.Reviews;
 
-      return newState;
+      if (Array.isArray(action.reviews.reviews.Reviews)){
+        action.reviews.reviews.Reviews.forEach(el => {
+          newState.spots[action.payload.id].Reviews[el.id] = el;
+        });
+      }
+    return newState;
     case GET_SPOTS:
       if (!newState.spots) newState.spots = {};
       action.payload.forEach(element => {
