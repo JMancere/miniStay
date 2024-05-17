@@ -57,7 +57,11 @@ const router = createBrowserRouter([
       {
         path: 'current',
         element: <SpotManage />
-      }
+      },
+      {
+        path: 'current/:id',
+        element: <SpotDetail doManage={true}/>
+      },
     ]
   },
   {

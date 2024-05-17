@@ -41,7 +41,7 @@ function SpotManage() {
   }
   return (
     <div className="redBox">
-      <h1>Spot List</h1>
+      <h1>Manage Spots</h1>
       <ul className="redBox spots">
         {getSL()}
       </ul>
