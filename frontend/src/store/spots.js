@@ -3,6 +3,15 @@ import { csrfFetch } from "./csrf";
 const GET_SPOTS = "spots/getAll";
 const GET_SPOTDETAILS = "spots/getSpotDetails";
 const ADD_SPOT = 'spots/addSpot';
+const ADD_REVIEW = 'soits/addReview';
+
+const addReview = (spotId, review) => {
+  return {
+    type: ADD_REVIEW,
+    payload: review,
+    spotId
+  };
+};
 
 const getAllSpots = (spots) => {
   return {
@@ -24,6 +33,31 @@ const addSpot = (spot) => {
     payload: {spot},
   };
 }
+
+export const createReviewThunk = (spot, review) => async (dispatch) => {
+  console.log('CREATING REVIEW:::', review);
+
+  let response;
+  response = await csrfFetch(`/api/spots/${spot.id}/reviews`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(review)
+    }
+  );
+
+  if (response.ok){
+    //const data = await response.json();
+
+    getSpotDetailsThunk(spot.id)
+
+    //dispatch(addReview(spot.id, data));
+  } else {
+  }
+
+  return response;
+};
+
 export const createSpotThunk = (spot) => async (dispatch) => {
   console.log('CREATING SPOT:::', spot);
 
@@ -120,22 +154,26 @@ export const getSpotDetailsThunk = (id) => async (dispatch) => {
 const initialState = { spots: null };
 
 const spotsReducer = (state = initialState, action) => {
-  let newState;
+  let newState = structuredClone(state);
   switch (action.type) {
+    case ADD_REVIEW:
+      if (!newState.details[action.payload.spotId].reviews) {
+        newState.details[action.payload.spotId].reviews = []
+      }
+      newState.details[action.payload.spotId].reviews.push(action.payload)
+      return newState;
     case ADD_SPOT:
-      newState = Object.assign({}, state);
       if (!newState.spots) newState.spots = {}
       newState.spots[action.payload.spot.id] = action.payload;
       return newState;
     case GET_SPOTDETAILS:
-      newState = Object.assign({}, state);
-      if (!newState.details)
-      newState.details = {};
+
+      if (!newState.details) newState.details = {};
       newState.details[action.payload.spot.id] = action.payload;
+
       return newState;
     case GET_SPOTS:
-      newState = Object.assign({}, state);
-      newState.spots = {};
+      if (!newState.spots) newState.spots = {};
       action.payload.forEach(element => {
         newState.spots[element.id] = element
       });

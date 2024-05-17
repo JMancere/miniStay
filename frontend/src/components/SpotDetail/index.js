@@ -2,17 +2,14 @@ import './SpotDetail.css'
 import { useDispatch, useSelector } from "react-redux";
 import {useParams} from 'react-router-dom';
 import { getSpotDetailsThunk } from '../../store/spots';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import ReviewItem from '../ReviewItem';
 
-
 import OpenModalBtn from '../Navigation/OpenModalBtn';
-
-import LoginFormModal from '../LoginFormModal';
 import NewReviewModal from '../NewReviewModal';
+
 function SpotDetail() {
   //need to get spot from store.
-  const ulRef = useRef();
   const dispatch = useDispatch();
 
   const { id } = useParams();
@@ -36,7 +33,7 @@ function SpotDetail() {
 
   useEffect(() => {
      dispatch(getSpotDetailsThunk(id));
-  }, [dispatch, id]);
+  }, [dispatch, id, reviews?.length]);
 
 
   console.log('EL SESSIONUSER:::', sessionUser)
@@ -89,9 +86,6 @@ function SpotDetail() {
                     buttonText="Post your review"
                     modalComponent={<NewReviewModal spot={spot}/>}
                   />
-
-
-                  {/* <button className ='postReview' onClick={postReview}>Post your review</button> */}
               <p>Be the first to post a review!</p>
             </>
             )
