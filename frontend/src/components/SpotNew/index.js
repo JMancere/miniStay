@@ -116,8 +116,8 @@ const handleSubmit = (e) => {
     spot.address = address;
     spot.city = city;
     spot.state = state;
-    spot.lat = lat;
-    spot.lng = lng;
+    spot.lat = 1;
+    spot.lng = 1;
     spot.description = description;
     spot.name = name;
     spot.price = price;
