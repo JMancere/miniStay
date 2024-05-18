@@ -43,16 +43,20 @@ const router = createBrowserRouter([
     ,
     children: [
       {
+        path: 'undefined',
+        element:<Navigate to='/spots' replace={true} />
+      },
+      {
         path: '',
         element: <Spots />
       },
       {
-        path: ':id',
-        element: <SpotDetail />
-      },
-      {
         path: 'new',
         element: <SpotNew />
+      },
+      {
+        path: ':id',
+        element: <SpotDetail />
       },
       {
         path: 'current',
@@ -61,6 +65,10 @@ const router = createBrowserRouter([
       {
         path: 'current/:id',
         element: <SpotDetail doManage={true}/>
+      },
+      {
+        path: 'current/:id/edit',
+        element: <SpotNew doEdit={true}/>
       },
     ]
   },

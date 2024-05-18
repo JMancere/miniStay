@@ -4,11 +4,25 @@ import { useState, useEffect } from 'react';
 import { createSpotThunk } from '../../store/spots';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { getSpotDetailsThunk } from '../../store/spots';
+import { updateSpotThunk } from '../../store/spots';
 
-function SpotNew() {
+function SpotNew( {doEdit}) {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const {id} = useParams();
+
+  const spot = useSelector((store) => {
+      if (id && store.spots.spots && store.spots.spots[id])
+        return store.spots.spots[id];
+
+      return null
+    });
+
   const [country, setCountry] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
@@ -24,16 +38,74 @@ function SpotNew() {
   const [img3, setImg3] = useState('');
   const [img4, setImg4] = useState('');
   const [errors, setErrors] = useState("");
-  //const [doReset, setDoReset] = useState();
+  const [loadedspot, setLoadedSpot] = useState(false);
 
-//   useEffect(() => {
-//     if (doReset){
-//         navigate(`/spots/${doReset}`);
-//       };
-//  }, [navigate, doReset]);
+  if (doEdit && spot && !loadedspot){
+    setLoadedSpot(true)
+    setCountry(spot.country);
+    setAddress(spot.address);
+    setCity(spot.city);
+    setState(spot.state);
+    setLat(spot.lat);
+    setLng(spot.lng);
+    setDescription(spot.description);
+    setName(spot.name);
+    setPrice(spot.price);
+    //setImgPreview] = useState('');
+    //const [img1, setImg1] = useState('');
+    //const [img2, setImg2] = useState('');
+    //const [img3, setImg3] = useState('');
+    //const [img4, setImg4] = useState('');
+  }
+
+  useEffect(() => {
+    if (doEdit)
+      dispatch(getSpotDetailsThunk(id));
+ }, [dispatch, id, doEdit]);
 
 
- const handleSubmit = (e) => {
+ const handleEditSubmit = (e) => {
+  e.preventDefault();
+
+  //need to reset errors on submit cause they need to be retried.
+  setErrors('');
+
+  const spot = {}
+  spot.id = id;
+  spot.country = country;
+  spot.address = address;
+  spot.city = city;
+  spot.state = state;
+  spot.lat = lat;
+  spot.lng = lng;
+  spot.description = description;
+  spot.name = name;
+  spot.price = price;
+  spot.imgPreview = imgPreview;
+
+  if (img1) spot.img1 = img1;
+  if (img2) spot.img2 = img2;
+  if (img3) spot.img3 = img3;
+  if (img4) spot.img4 = img4;
+
+  return dispatch(updateSpotThunk(spot))
+    .then(
+       () => {
+        reset({id})
+       }
+    ).catch(async (res) => {
+      console.log('IN CATCH, ', res);
+      const data = await res.json();
+
+      console.log('EL errors::', data.errors)
+      if (data && data.errors) {
+        return spot.Owner;
+      }
+    });
+
+};
+
+const handleSubmit = (e) => {
     e.preventDefault();
 
     //need to reset errors on submit cause they need to be retried.
@@ -68,7 +140,7 @@ function SpotNew() {
 
         console.log('EL errors::', data.errors)
         if (data && data.errors) {
-          return spot.Owner;
+          return setErrors(data.errors);
         }
       });
 
@@ -103,10 +175,17 @@ function SpotNew() {
     }
   };
 
+  const getTitle = () => {
+    if (doEdit){
+      return 'Update your Spot'
+    } else
+      return 'Create a new Spot'
+  }
+
   return <>
-      <form className='container' onSubmit={handleSubmit}>
+      <form className='container' onSubmit={doEdit ? handleEditSubmit : handleSubmit}>
         {/* <div className='inForm'> */}
-        <h1> Create a new Spot</h1>
+        <h1> {getTitle()} </h1>
         <h2>Where's your place located?</h2>
         <h4>Guests will only get your exact address once they booked a reservation. </h4>
         {/* <label> */}
@@ -225,7 +304,7 @@ function SpotNew() {
               value={imgPreview}
               placeholder='Preview Image URL'
               name='imgPreview'
-              required
+              required={!doEdit}
         />
         {errors.img1 && (<p className="error">{errors.img1}</p>)}
         <input
@@ -262,7 +341,7 @@ function SpotNew() {
 
         <hr></hr>
 
-        <button type='submit'>Create Spot</button>
+        <button type='submit'> {doEdit ? 'Update your Spot' : 'Create Spot'}</button>
         {/* </div> */}
       </form>
   </>

@@ -19,7 +19,11 @@ function ReviewItem({review }) {
   const hasDelete = () =>{
     if (!sessionUser?.id || !review.User?.id) return;
 
-    return (<button>Delete</button>)
+    if (sessionUser.id === review.User.id)
+      return (<button>Delete</button>);
+
+
+    return
   }
 
   const doDeleteClick = () =>{

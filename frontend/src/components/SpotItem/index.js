@@ -1,25 +1,34 @@
 import './SpotItem.css'
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function SpotItem( {doManage, spot} ) {
+  const navigate = useNavigate();
 
 //  "https://www.pinclipart.com/picdir/big/519-5193057_hut-clipart-wooden-house-wooden-house-clipart-png.png"
 //<image src= {spot.previewImage} alt={spot.previewImage}></image>
 //<img src="https://www.pinclipart.com/picdir/big/519-5193057_hut-clipart-wooden-house-wooden-house-clipart-png.png" height="30px" alt="preview"></img>
 
-  //getNav()
+  const updateClick = (e) => {
+    e.preventDefault()
+    navigate(`${spot.id}/edit`);
+  }
+  const deleteClick = (e) => {
+    e.preventDefault()
+  }
 
   const getManageBtns = () => {
     if (doManage){
       return (
         <>
-          <div><button>Update</button></div>
-          <div><button>Delete</button></div>
+          <div><button onClick={updateClick}>Update</button></div>
+          <div><button onClick={deleteClick}>Delete</button></div>
         </>
       )
     } else
       return;
   }
+
 
   return (
     <><NavLink to={`${spot.id}`} exact="true">
