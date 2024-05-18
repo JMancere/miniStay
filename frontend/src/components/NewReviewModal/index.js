@@ -18,13 +18,13 @@ function NewReviewModal({spot}) {
     e.preventDefault();
     setErrors("");
     let rev = {stars, review}
-    console.log('spot rev is ', spot, rev)
+    //console.log('spot rev is ', spot, rev)
     return dispatch(createReviewThunk(spot, rev))
       .then(closeModal)
       .catch(async (res) => {
-        console.log(res)
+        //console.log(res)
         const data = await res.json();
-        console.log('errors add review',data.message)
+        //console.log('errors add review',data.message)
 
         if (data && data.message) {
           setErrors(data.message);

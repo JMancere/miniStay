@@ -1,6 +1,5 @@
 import './SpotItem.css'
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import OpenModalBtn from '../Navigation/OpenModalBtn';
 import ConfirmModal from '../ConfirmModal';
 import { deleteSpotThunk } from '../../store/spots';
@@ -23,7 +22,7 @@ function SpotItem( {doManage, spot} ) {
   const getManageBtns = () => {
     const yesDelete = () => {
       //want to delete this spot.
-      console.log('attempting delete')
+      //console.log('attempting delete')
       dispatch(deleteSpotThunk(spot.id)).then();
     }
 

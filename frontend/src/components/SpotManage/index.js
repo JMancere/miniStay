@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react';
 import SpotItem from '../SpotItem';
 import { getCurrentSpotsThunk } from '../../store/spots';
-import { getAllSpotsThunk } from '../../store/spots';
 
 function SpotManage() {
   const dispatch = useDispatch();
@@ -42,7 +41,7 @@ function SpotManage() {
   }, [dispatch]);
 
 
-  console.log('spots===', spots);
+  //console.log('spots===', spots);
 
   function getSL(){
     let res = [];

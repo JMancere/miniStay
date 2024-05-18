@@ -94,10 +94,10 @@ function SpotNew( {doEdit}) {
         reset({id})
        }
     ).catch(async (res) => {
-      console.log('IN CATCH, ', res);
+      //console.log('IN CATCH, ', res);
       const data = await res.json();
 
-      console.log('EL errors::', data.errors)
+      //console.log('EL errors::', data.errors)
       if (data && data.errors) {
         return spot.Owner;
       }
@@ -135,10 +135,10 @@ const handleSubmit = (e) => {
          }
         //setDoReset(true)
       ).catch(async (res) => {
-        console.log('IN CATCH, ', res);
+        //console.log('IN CATCH, ', res);
         const data = await res.json();
 
-        console.log('EL errors::', data.errors)
+        //console.log('EL errors::', data.errors)
         if (data && data.errors) {
           return setErrors(data.errors);
         }
@@ -147,15 +147,15 @@ const handleSubmit = (e) => {
   };
 
   const reset = (res) => {
-    console.log('in reset...')
-    console.log('errors ===', errors)
-    console.log('reset res ==== ', res)
+    //console.log('in reset...')
+    //console.log('errors ===', errors)
+    //console.log('reset res ==== ', res)
     //console.log('newError ===', newError)
     if (errors) {
-      console.log('in reset... NOT CLOSING')
+      //console.log('in reset... NOT CLOSING')
       return;
     } else {
-      console.log('in reset... !!!!!CLOSING!!!!!')
+      //console.log('in reset... !!!!!CLOSING!!!!!')
       setCountry('');
       setAddress('');
       setCity('');

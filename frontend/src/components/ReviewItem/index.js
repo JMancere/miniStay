@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 
 function ReviewItem({review }) {
   const dispatch = useDispatch();
-  console.log('EL review', review)
+  //console.log('EL review', review)
 
   const sessionUser = useSelector(state => state.session.user);
 
@@ -26,7 +26,7 @@ function ReviewItem({review }) {
 
     const yesDelete = () => {
       //want to delete this review.
-      console.log('attempting delete')
+      //console.log('attempting delete')
       dispatch(deleteReviewThunk(review.id)).then();
     }
 

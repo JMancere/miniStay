@@ -2,7 +2,7 @@ import './SpotDetail.css'
 import { useDispatch, useSelector } from "react-redux";
 import {useParams} from 'react-router-dom';
 import { getSpotDetailsThunk } from '../../store/spots';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import ReviewItem from '../ReviewItem';
 
 import OpenModalBtn from '../Navigation/OpenModalBtn';
@@ -17,7 +17,7 @@ function SpotDetail() {
   const sessionUser = useSelector(state => state.session.user);
 
   const spot = useSelector((store) => {
-    console.log('store=====', store);
+    //console.log('store=====', store);
     if (store.spots.spots && store.spots.spots[id])
       return store.spots.spots[id];
 
@@ -37,9 +37,9 @@ function SpotDetail() {
   }, [dispatch, id]);
 
 
-  console.log('EL SESSIONUSER:::', sessionUser)
-  console.log('EL SPOT:::', spot)
-  console.log('EL REVIEWS:::', reviews)
+  //console.log('EL SESSIONUSER:::', sessionUser)
+  //console.log('EL SPOT:::', spot)
+  //console.log('EL REVIEWS:::', reviews)
 
   function getImages(){
     //return preview first then the rest
@@ -117,6 +117,14 @@ function SpotDetail() {
           for (let r in reviews){
             lcl.push(reviews[r]);
           }
+          //console.log('asdasdasdasdas222223211312')
+          // let lclSort = lcl.sort( (a, b) => {
+          //   let timeA = a.createdAt;
+          //   let timeB = b.createdAt;
+          //   return timeA > timeB;
+          //   }
+          // );
+
           res = lcl.map((review) => {
             return <ReviewItem className='reviewItem' key={review.id} review={review}/>
           });

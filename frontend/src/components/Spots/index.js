@@ -14,7 +14,7 @@ function Spots() {
   }, [dispatch]);
 
 
-  console.log('spots===', spots);
+  //console.log('spots===', spots);
 
   function getSL(){
     let res = [];

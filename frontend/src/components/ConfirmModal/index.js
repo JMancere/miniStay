@@ -1,38 +1,35 @@
 import './ConfirmModal.css';
 
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
 import { useModal } from "../../context/Modal";
-import { useRef } from "react";
-
 
 function ConfirmModal({detail}) {
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
 
-  const [errors, setErrors] = useState("");
+  //const [errors, setErrors] = useState("");
 
   const { closeModal } = useModal();
 
-  const formRef = useRef(null)
+  //const formRef = useRef(null)
 
   const {heading, text, yesText, noText, yesAction, noAction} = detail;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // setErrors("");
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // setErrors("");
 
-    // return dispatch(sessionActions.login({ credential, password }))
-    //   .then(closeModal)
-    //   .catch(async (res) => {
-    //     console.log(res)
-    //     const data = await res.json();
-    //     console.log(data.message)
+  //   // return dispatch(sessionActions.login({ credential, password }))
+  //   //   .then(closeModal)
+  //   //   .catch(async (res) => {
+  //   //     console.log(res)
+  //   //     const data = await res.json();
+  //   //     console.log(data.message)
 
-    //     if (data && data.message) {
-    //       setErrors(data.message);
-    //     }
-    //   });
-  };
+  //   //     if (data && data.message) {
+  //   //       setErrors(data.message);
+  //   //     }
+  //   //   });
+  // };
 
   const yesClick = async () => {
     if (yesAction) await yesAction();

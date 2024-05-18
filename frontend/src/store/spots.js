@@ -30,13 +30,13 @@ const editSpot = (spot) => {
   };
 }
 
-const addReview = (spotId, review) => {
-  return {
-    type: ADD_REVIEW,
-    payload: review,
-    spotId
-  };
-};
+// const addReview = (spotId, review) => {
+//   return {
+//     type: ADD_REVIEW,
+//     payload: review,
+//     spotId
+//   };
+// };
 
 const getAllSpots = (spots) => {
   return {
@@ -68,7 +68,7 @@ const addSpot = (spot) => {
 // }
 
 export const deleteReviewThunk = (reviewId) => async (dispatch) => {
-  console.log('Deleting REVIEW:::', reviewId);
+  //console.log('Deleting REVIEW:::', reviewId);
 
   let response;
   response = await csrfFetch(`/api/reviews/${reviewId}`,
@@ -79,8 +79,9 @@ export const deleteReviewThunk = (reviewId) => async (dispatch) => {
     }
   );
   if (response.ok){
-    const data = await response.json();
-    console.log('REVIEW DELETED data', data)
+    //const data = await response.json();
+    await response.json();
+    //console.log('REVIEW DELETED data', data)
     dispatch(deleteReview(reviewId));
   } else {
   }
@@ -89,7 +90,7 @@ export const deleteReviewThunk = (reviewId) => async (dispatch) => {
 }
 
 export const deleteSpotThunk = (spotId) => async (dispatch) => {
-  console.log('Deleting SPOT:::', spotId);
+  //console.log('Deleting SPOT:::', spotId);
 
   let response;
   response = await csrfFetch(`/api/spots/${spotId}`,
@@ -100,8 +101,9 @@ export const deleteSpotThunk = (spotId) => async (dispatch) => {
     }
   );
   if (response.ok){
-    const data = await response.json();
-    console.log('SPOTS DELETED data', data)
+    //const data = await response.json();
+    await response.json();
+    //console.log('SPOTS DELETED data', data)
     dispatch(deleteSpot(spotId));
   } else {
   }
@@ -109,7 +111,7 @@ export const deleteSpotThunk = (spotId) => async (dispatch) => {
 }
 
 export const updateSpotThunk = (spot) => async (dispatch) => {
-  console.log('UPDATING SPOT:::', spot);
+  //console.log('UPDATING SPOT:::', spot);
 
   let response;
   response = await csrfFetch(`/api/spots/${spot.id}`,
@@ -121,7 +123,7 @@ export const updateSpotThunk = (spot) => async (dispatch) => {
   );
   if (response.ok){
     const data = await response.json();
-    console.log('SPOTS THUNK data', data)
+    //console.log('SPOTS THUNK data', data)
     dispatch(editSpot(data));
   } else {
   }
@@ -135,7 +137,7 @@ export const getCurrentSpotsThunk = () => async (dispatch) => {
 
   if (response.ok){
     const data = await response.json();
-    console.log('SPOTS THUNK data', data)
+    //console.log('SPOTS THUNK data', data)
     dispatch(getAllSpots(data.Spots));
   } else {
   }
@@ -144,7 +146,7 @@ export const getCurrentSpotsThunk = () => async (dispatch) => {
 }
 
 export const createReviewThunk = (spot, review) => async (dispatch) => {
-  console.log('CREATING REVIEW:::', review);
+  //console.log('CREATING REVIEW:::', review);
 
   let response;
   response = await csrfFetch(`/api/spots/${spot.id}/reviews`,
@@ -167,7 +169,7 @@ export const createReviewThunk = (spot, review) => async (dispatch) => {
 };
 
 export const createSpotThunk = (spot) => async (dispatch) => {
-  console.log('CREATING SPOT:::', spot);
+  //console.log('CREATING SPOT:::', spot);
 
   let response;
   response = await csrfFetch("/api/spots/",
@@ -181,7 +183,7 @@ export const createSpotThunk = (spot) => async (dispatch) => {
   if (response.ok){
     const data = await response.json();
     dispatch(addSpot(data));
-    console.log('adadaddadad', data)
+    //console.log('adadaddadad', data)
     //add any images
     if (spot.imgPreview){
       let img = {};
@@ -200,7 +202,7 @@ export const createSpotThunk = (spot) => async (dispatch) => {
           let img = {};
           img.url = spot['img'+i];
           img.preview = false;
-          console.log('attempting create ', 'img'+i, 'img'+i)
+          //console.log('attempting create ', 'img'+i, 'img'+i)
           response = await csrfFetch(`/api/spots/${data.id}/images`,
           {
             method: 'POST',
@@ -228,7 +230,7 @@ export const getAllSpotsThunk = () => async (dispatch) => {
 
   if (response.ok){
     const data = await response.json();
-    console.log('SPOTS THUNK data', data)
+    //console.log('SPOTS THUNK data', data)
     dispatch(getAllSpots(data.Spots));
   } else {
   }
@@ -242,7 +244,7 @@ export const getSpotDetailsThunk = (id) => async (dispatch) => {
 
   if (response.ok){
     const data = await response.json();
-    console.log('data for spotdets::', data)
+    //console.log('data for spotdets::', data)
     //dispatch(getSpotDetails(data));
 
     //now that we have pot data, get reviews for that spot.
