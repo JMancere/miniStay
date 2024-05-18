@@ -4,12 +4,18 @@ const GET_SPOTS = "spots/getAll";
 const GET_SPOTDETAILS = "spots/getSpotDetails";
 const ADD_SPOT = 'spots/addSpot';
 const EDIT_SPOT = 'spots/editSpot';
+const DELETE_SPOT = 'spots/deleteSpot';
 const ADD_REVIEW = 'spots/addReview';
 const GET_SPOTSCURRENT = 'spots/getSpotsCurrent';
 
+const deleteSpot = (spotID) => {
+  return {
+    type: DELETE_SPOT,
+    payload: spotID
+  };
+}
 
 const editSpot = (spot) => {
-  console.log('eeeeeeewewewewe', spot);
   return {
     type: EDIT_SPOT,
     payload: spot
@@ -46,11 +52,32 @@ const addSpot = (spot) => {
   };
 }
 
-const getSpotsCurrent = (spots) => {
-  return {
-    type: GET_SPOTSCURRENT,
-    payload: spots,
-  };
+// const getSpotsCurrent = (spots) => {
+//   return {
+//     type: GET_SPOTSCURRENT,
+//     payload: spots,
+//   };
+// }
+
+export const deleteSpotThunk = (spotId) => async (dispatch) => {
+  console.log('Deleting SPOT:::', spotId);
+
+  let response;
+  response = await csrfFetch(`/api/spots/${spotId}`,
+    {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: null//JSON.stringify(spot)
+    }
+  );
+  if (response.ok){
+    const data = await response.json();
+    console.log('SPOTS DELETED data', data)
+    dispatch(deleteSpot(spotId));
+  } else {
+  }
+  return response;
+
 }
 
 export const updateSpotThunk = (spot) => async (dispatch) => {
@@ -217,15 +244,20 @@ const spotsReducer = (state = initialState, action) => {
       newState.spots[action.spotId].Reviews2 = action.payload;
 
       return newState;
-      case ADD_SPOT:
-        if (!newState.spots) newState.spots = {}
-        newState.spots[action.payload.spot.id] = action.payload;
+    case DELETE_SPOT:
+      if (newState.spots && newState.spots[action.payload]) {
+        delete newState.spots[action.payload];
+      }
       return newState;
-      case EDIT_SPOT:
-        if (!newState.spots) newState.spots = {}
-           newState.spots[action.payload.id] = action.payload;
+    case ADD_SPOT:
+      if (!newState.spots) newState.spots = {}
+      newState.spots[action.payload.spot.id] = action.payload;
       return newState;
-      case GET_SPOTDETAILS:
+    case EDIT_SPOT:
+      if (!newState.spots) newState.spots = {}
+          newState.spots[action.payload.id] = action.payload;
+      return newState;
+    case GET_SPOTDETAILS:
       if (!newState.spots) newState.spots = {};
       newState.spots[action.payload.id] = action.payload;
       //console.log('act revs ===', action.reviews)
@@ -241,8 +273,8 @@ const spotsReducer = (state = initialState, action) => {
           newState.spots[action.payload.id].Reviews[el.id] = el;
         });
       }
-    return newState;
-    case GET_SPOTS:
+      return newState;
+      case GET_SPOTS:
     case GET_SPOTSCURRENT:
       if (!newState.spots) newState.spots = {};
       action.payload.forEach(element => {

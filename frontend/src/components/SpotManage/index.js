@@ -11,16 +11,30 @@ function SpotManage() {
 
   const sessionUser = useSelector(state => state.session.user);
 
-  const spots2 = useSelector((store) => {
-    let result = {}
-    for (let spot in store.spots){
-      //if (sessionUser?.id === store.spots[spot].Owner?.id)
-      result[spot] = store.spots[spot];
+  const spots = useSelector((store) => {
+    let result = {spots: {}}
+    //console.log('asdasdasdasdas 111111', store.spots.spots)
+    for (let spot in store.spots.spots){
+      //console.log('asdasdasdasdas 333333', spot)
+      //console.log('asdasdasdasdas 3aaaaaa', store.spots.spots[spot])
+      if (sessionUser?.id === store.spots.spots[spot].ownerId)
+      result.spots[spot] = store.spots.spots[spot];
     }
+    console.log('asdasdasdasdas RRRRR', result)
     return result
   });
 
-  const spots = useSelector((store) => store.spots)
+  const spots2 = useSelector((store) => store.spots)
+  // const spots = useSelector((store) => {
+  //   const result = {};
+
+  //   for (let i in store.spots){
+  //     if (store.spots[i]?.ownerId === sessionUser.id){
+  //       result[i] = store.spots[i]
+  //     }
+  //   }
+  //   return result;
+  // });
 
   useEffect(() => {
     dispatch(getCurrentSpotsThunk());

@@ -1,0 +1,13 @@
+.btnNo{
+  box-shadow: "2px 2px 2px black";
+  background-color: "gray";
+  color: "white";
+}
+
+.btnNo{
+  width: "fit-content";
+  box-shadow: "2px 2px 2px black";
+  background-color: "gray";
+  cursor: "pointer";
+  color: "white";
+}

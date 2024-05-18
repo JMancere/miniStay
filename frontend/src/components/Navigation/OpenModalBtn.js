@@ -5,11 +5,12 @@ function OpenModalBtn({
   modalComponent, // component to render inside the modal
   buttonText, // text of the menu item that opens the modal
   onButtonClick, // optional: callback function that will be called once the menu item that opens the modal is clicked
-  onModalClose // optional: callback function that will be called once the modal is closed
+  onModalClose, // optional: callback function that will be called once the modal is closed
 }) {
   const { setModalContent, setOnModalClose } = useModal();
 
-  const onClick = () => {
+  const onClick = (e) => {
+    e.preventDefault();
     if (typeof onButtonClick === "function") onButtonClick();
     if (typeof onModalClose === "function") setOnModalClose(onModalClose);
     setModalContent(modalComponent);

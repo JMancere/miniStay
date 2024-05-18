@@ -5,6 +5,7 @@ import { useModal } from "../../context/Modal";
 import { useRef } from "react";
 import PawsRatingInput from './PawsRatingInput';
 import { createReviewThunk } from '../../store/spots';
+
 function NewReviewModal({spot}) {
   const dispatch = useDispatch();
   const [review, setReview] = useState("");

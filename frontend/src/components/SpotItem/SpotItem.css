@@ -16,3 +16,11 @@
 .price {
   font-weight: bold;
 }
+
+.btnEdit{
+    width: "fit-content";
+    box-shadow: "2px 2px 2px black";
+    background-color: "gray";
+    cursor: "pointer";
+    color: "white";
+}

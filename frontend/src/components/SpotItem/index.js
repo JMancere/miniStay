@@ -1,9 +1,15 @@
 import './SpotItem.css'
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import OpenModalBtn from '../Navigation/OpenModalBtn';
+import ConfirmModal from '../ConfirmModal';
+import { deleteSpotThunk } from '../../store/spots';
+import { useDispatch } from 'react-redux';
+
 
 function SpotItem( {doManage, spot} ) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
 //  "https://www.pinclipart.com/picdir/big/519-5193057_hut-clipart-wooden-house-wooden-house-clipart-png.png"
 //<image src= {spot.previewImage} alt={spot.previewImage}></image>
@@ -13,22 +19,43 @@ function SpotItem( {doManage, spot} ) {
     e.preventDefault()
     navigate(`${spot.id}/edit`);
   }
-  const deleteClick = (e) => {
-    e.preventDefault()
-  }
 
   const getManageBtns = () => {
+    const yesDelete = () => {
+      //want to delete this spot.
+      console.log('attempting delete')
+      dispatch(deleteSpotThunk(spot.id)).then();
+    }
+
+    const noDelete = () => {
+      //
+    }
+
     if (doManage){
+      const detail =
+        {
+          heading: "Confirm Delete",
+          text: "Are you sure you want to remove this spot from the listings?",
+          yesText: "Yes (Delete Spot)",
+          noText: "No (Keep Spot)",
+          yesAction: yesDelete,
+          noAction: noDelete
+        };
+
       return (
         <>
-          <div><button onClick={updateClick}>Update</button></div>
-          <div><button onClick={deleteClick}>Delete</button></div>
+          <div><button className="btn" onClick={updateClick}>Update</button></div>
+          <div>
+          <OpenModalBtn
+            buttonText="Delete"
+            modalComponent={<ConfirmModal detail={detail}/>}
+          />
+          </div>
         </>
       )
     } else
       return;
   }
-
 
   return (
     <><NavLink to={`${spot.id}`} exact="true">
