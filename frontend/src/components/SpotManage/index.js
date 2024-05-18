@@ -20,11 +20,11 @@ function SpotManage() {
       if (sessionUser?.id === store.spots.spots[spot].ownerId)
       result.spots[spot] = store.spots.spots[spot];
     }
-    console.log('asdasdasdasdas RRRRR', result)
+    //console.log('asdasdasdasdas RRRRR', result)
     return result
   });
 
-  const spots2 = useSelector((store) => store.spots)
+  //const spots2 = useSelector((store) => store.spots)
   // const spots = useSelector((store) => {
   //   const result = {};
 

@@ -2,7 +2,7 @@ import './SpotDetail.css'
 import { useDispatch, useSelector } from "react-redux";
 import {useParams} from 'react-router-dom';
 import { getSpotDetailsThunk } from '../../store/spots';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ReviewItem from '../ReviewItem';
 
 import OpenModalBtn from '../Navigation/OpenModalBtn';
@@ -73,6 +73,26 @@ function SpotDetail() {
 
   function currentUserOwnsSpot(){
     return sessionUser ? sessionUser.id === spot.Owner?.id : true;
+  }
+
+  function currentUserAuthToReview(){
+    //to post a review need to not be the owner
+    //and not have any reviews for this spot.
+    let validUser = sessionUser ? sessionUser.id !== spot.Owner?.id : false;
+
+    if (!validUser || Object.keys(reviews).length === 0) return;
+
+    for (let r in reviews){
+      validUser = validUser && (reviews[r].User.id !== sessionUser.id)
+    }
+    if (validUser){
+      return (
+        <OpenModalBtn
+         buttonText="Post your review"
+         modalComponent={<NewReviewModal spot={spot}/>}
+       />)
+    }
+
   }
 
   function getRL(){
@@ -148,6 +168,7 @@ function SpotDetail() {
 
     <h2>★ {spot.avgStarRating} {getStarLengthStr(reviews.length)}</h2>
     <div className="DetailBottom redBox">
+      {currentUserAuthToReview()}
       {getRL()}
     </div>
     </>

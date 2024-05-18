@@ -13,6 +13,35 @@ const {SpotImage} = require('../../db/models');
  const { handleValidationErrors } = require('../../utils/validation');
  const { stub } = require('../../utils/utils');
 
+ router.get('/all',
+ async (req, res) => {
+   let spots = await Spot.findAll(
+       {
+         limit: size,
+         offset: size * (page - 1),
+         include: ['Reviews', 'SpotImages'],
+           //If you include the where clause it will only return spots that have preview.
+           //So, if a spot does not have preview, it wont list. Which is not what we want.
+           //include: ['Reviews', { model: SpotImage, where: {preview: true}}],
+       }
+   );
+   if (spots){
+       const options = {previewImage: true, avgRating: true};
+       calcPreviewAndAvgReview(spots, options);
+
+       //Remove spotimages and reviews from resultset.
+       spots.forEach(spot => {
+           delete spot.dataValues.SpotImages
+           delete spot.dataValues.Reviews
+       });
+   }
+   const Spots = spots;
+   return res.json({
+       Spots,
+   });
+ }
+)
+
 const calcPreviewAndAvgReview = (spots, option) => {
     spots.forEach(spot => {
         if (option.previewImage){

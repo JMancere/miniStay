@@ -5,8 +5,16 @@ const GET_SPOTDETAILS = "spots/getSpotDetails";
 const ADD_SPOT = 'spots/addSpot';
 const EDIT_SPOT = 'spots/editSpot';
 const DELETE_SPOT = 'spots/deleteSpot';
+const DELETE_REVIEW = 'spots/deleteReview';
 const ADD_REVIEW = 'spots/addReview';
 const GET_SPOTSCURRENT = 'spots/getSpotsCurrent';
+
+const deleteReview = (reviewID) => {
+  return {
+    type: DELETE_REVIEW,
+    payload: reviewID
+  };
+}
 
 const deleteSpot = (spotID) => {
   return {
@@ -59,6 +67,27 @@ const addSpot = (spot) => {
 //   };
 // }
 
+export const deleteReviewThunk = (reviewId) => async (dispatch) => {
+  console.log('Deleting REVIEW:::', reviewId);
+
+  let response;
+  response = await csrfFetch(`/api/reviews/${reviewId}`,
+    {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: null//JSON.stringify(spot)
+    }
+  );
+  if (response.ok){
+    const data = await response.json();
+    console.log('REVIEW DELETED data', data)
+    dispatch(deleteReview(reviewId));
+  } else {
+  }
+  return response;
+
+}
+
 export const deleteSpotThunk = (spotId) => async (dispatch) => {
   console.log('Deleting SPOT:::', spotId);
 
@@ -77,7 +106,6 @@ export const deleteSpotThunk = (spotId) => async (dispatch) => {
   } else {
   }
   return response;
-
 }
 
 export const updateSpotThunk = (spot) => async (dispatch) => {
@@ -128,8 +156,10 @@ export const createReviewThunk = (spot, review) => async (dispatch) => {
   );
 
   if (response.ok){
-    const data = await response.json();
-    dispatch(addReview(spot.id, data));
+
+    //const data = await response.json();
+    // dispatch(addReview(spot.id, data));
+    dispatch(getSpotDetailsThunk(spot.id))
   } else {
   }
 
@@ -243,6 +273,17 @@ const spotsReducer = (state = initialState, action) => {
       newState.spots[action.spotId].Reviews[action.payload.id] = action.payload;
       newState.spots[action.spotId].Reviews2 = action.payload;
 
+      return newState;
+
+    case DELETE_REVIEW:
+      //Sice reviews are nested in spots atm (they prob should be seperate store items)
+      //need to find and delete whatever wherever review matches.
+      if (newState.spots) {
+        for (let spot in newState.spots){
+          if (newState.spots[spot].Reviews && newState.spots[spot].Reviews[action.payload])
+            delete newState.spots[spot].Reviews[action.payload];
+        }
+      }
       return newState;
     case DELETE_SPOT:
       if (newState.spots && newState.spots[action.payload]) {
