@@ -4,7 +4,7 @@ import OpenModalBtn from '../Navigation/OpenModalBtn';
 import ConfirmModal from '../ConfirmModal';
 import { deleteSpotThunk } from '../../store/spots';
 import { useDispatch } from 'react-redux';
-
+import { FaStar } from 'react-icons/fa6';
 
 function SpotItem( {doManage, spot} ) {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ function SpotItem( {doManage, spot} ) {
         <img src={spot.previewImage} alt={spot.previewImage} height='400px' width="400px"></img>
         <div className='citystate redBox'>
           <p>{spot.city}, {spot.state}</p>
-          <p className='stars'>stars: {spot.avgRating}</p>
+          <p className='rating-input'><FaStar /> {spot.avgRating}</p>
         </div>
         {getManageBtns()}
         <p><span className='price'> ${spot.price}</span> night</p>

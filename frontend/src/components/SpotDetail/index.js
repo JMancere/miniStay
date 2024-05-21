@@ -7,6 +7,8 @@ import ReviewItem from '../ReviewItem';
 
 import OpenModalBtn from '../Navigation/OpenModalBtn';
 import NewReviewModal from '../NewReviewModal';
+import { FaStar } from 'react-icons/fa6';
+
 
 function SpotDetail() {
   //need to get spot from store.
@@ -167,14 +169,14 @@ function SpotDetail() {
       <div className='midRating'>
         <div className='reserveBox'>
           <p><span style={{"fontWeight": "bold"}}>${spot.price}</span> night</p>
-          <p>★ {spot.avgStarRating} {getStarLengthStr(reviews.length)}</p>
+          <p className='rating-input'><FaStar /> {spot.avgStarRating} {getStarLengthStr(Object.keys(reviews).length)}</p>
           <button onClick={reserveClick} className='midBtn'>Reserve</button>
         </div>
 
       </div>
     </div>
 
-    <h2>★ {spot.avgStarRating} {getStarLengthStr(reviews.length)}</h2>
+    <h2 className='rating-input'><FaStar /> {spot.avgStarRating} {getStarLengthStr(Object.keys(reviews).length)}</h2>
     <div className="DetailBottom redBox">
       {currentUserAuthToReview()}
       {getRL()}

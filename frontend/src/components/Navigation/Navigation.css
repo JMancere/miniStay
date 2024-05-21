@@ -60,6 +60,7 @@ margin: none;
 }
 
 .profile-dropdown {
+  top: 80px;
   position: absolute;
   background-color: white;
   border: 10px black;
@@ -78,6 +79,7 @@ margin: none;
   padding: 10px;
   z-index: 1;
   cursor: pointer;
+
 }
 
 .hidden {

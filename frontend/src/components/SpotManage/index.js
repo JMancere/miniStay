@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useEffect } from 'react';
 import SpotItem from '../SpotItem';
 import { getCurrentSpotsThunk } from '../../store/spots';
+import { Link } from 'react-router-dom';
 
 function SpotManage() {
   const dispatch = useDispatch();
@@ -52,9 +53,20 @@ function SpotManage() {
     }
     return res ;
   }
+
+  const getHeader = () => {
+    if ((!spots.spots) || Object.keys(spots.spots).length > 0){
+      return "Manage Spots";
+    } else
+      return (
+        <Link to="/spots/new">Create a new spot</Link>
+      )
+  }
+
   return (
     <div className="redBox">
-      <h1>Manage Spots</h1>
+      {/* <h1>Manage Spots</h1> */}
+      <h1>{getHeader()}</h1>
       <ul className="redBox spots">
         {getSL()}
       </ul>
